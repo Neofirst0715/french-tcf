@@ -1,0 +1,830 @@
+<title>Cahier TCF</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&display=swap">
+<style>
+/* Layout concept: soft frosted-glass cards floating over a warm sand ground with one blurred orange orb.
+   Big light headings with a grey second line, black pill buttons with a round arrow cap, one near-black card for the next action. */
+:root{
+  --bg:#EBE4DB; --bg-trans:rgba(235,228,219,.8);
+  --glass:rgba(255,255,255,.58); --glass-hi:rgba(255,255,255,.86); --glass-line:rgba(255,255,255,.75); --edge:rgba(70,48,28,.12);
+  --fg:#171412; --muted:#8C8278; --ink:#1A1816; --ink-fg:#FFFFFF; --dark:#1C1B1A; --dark-fg:#F5F0EA; --dark-muted:#A39A90;
+  --orange:#EE8A3E; --orange-soft:rgba(238,138,62,.16); --orb:rgba(238,138,62,.34); --shadow:rgba(80,52,26,.22);
+  --ok:#2C7A4C; --ok-soft:rgba(60,150,95,.16); --bad:#B2432F; --bad-soft:rgba(190,70,50,.14); --warn:#A96510; --warn-soft:rgba(220,150,40,.2);
+  --ui:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16120F; --bg-trans:rgba(22,18,15,.8);
+    --glass:rgba(255,255,255,.07); --glass-hi:rgba(255,255,255,.12); --glass-line:rgba(255,255,255,.12); --edge:rgba(255,255,255,.14);
+    --fg:#F4EEE7; --muted:#A39A90; --ink:#F4EEE7; --ink-fg:#17130F; --dark:#0B0A09; --dark-fg:#F5F0EA; --dark-muted:#9A9189;
+    --orange:#FF9A4D; --orange-soft:rgba(255,154,77,.18); --orb:rgba(255,140,60,.32); --shadow:rgba(0,0,0,.5);
+    --ok:#6CCB8E; --ok-soft:rgba(108,203,142,.16); --bad:#FF8F7A; --bad-soft:rgba(255,143,122,.16); --warn:#F2B35E; --warn-soft:rgba(242,179,94,.16);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16120F; --bg-trans:rgba(22,18,15,.8);
+  --glass:rgba(255,255,255,.07); --glass-hi:rgba(255,255,255,.12); --glass-line:rgba(255,255,255,.12); --edge:rgba(255,255,255,.14);
+  --fg:#F4EEE7; --muted:#A39A90; --ink:#F4EEE7; --ink-fg:#17130F; --dark:#0B0A09; --dark-fg:#F5F0EA; --dark-muted:#9A9189;
+  --orange:#FF9A4D; --orange-soft:rgba(255,154,77,.18); --orb:rgba(255,140,60,.32); --shadow:rgba(0,0,0,.5);
+  --ok:#6CCB8E; --ok-soft:rgba(108,203,142,.16); --bad:#FF8F7A; --bad-soft:rgba(255,143,122,.16); --warn:#F2B35E; --warn-soft:rgba(242,179,94,.16);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);font-weight:400;font-size:15px;line-height:1.55;padding-inline:16px;padding-block:0 48px;min-height:100%}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(520px 520px at 92% 2%,var(--orb),transparent 70%),radial-gradient(640px 520px at 0% 100%,var(--glass),transparent 70%),radial-gradient(380px 380px at 75% 100%,var(--orange-soft),transparent 70%)}
+.wrap{max-width:820px;margin-inline:auto}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;line-height:1.2;text-wrap:balance}
+h2{font-size:1.9rem;font-weight:300;letter-spacing:-.02em}
+h2 .dim{color:var(--muted)}
+h3{font-size:1.05rem;font-weight:500}
+h4{font-size:.92rem;font-weight:600;margin:0 0 4px}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.num{font-variant-numeric:tabular-nums}
+.fr{font-size:1.1rem;line-height:1.75;font-weight:400}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(to bottom,var(--bg) 62%,transparent);margin-inline:-16px;padding:12px 16px 18px}
+.top .wrap{display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand b{font-size:1.05rem;font-weight:500;letter-spacing:.02em}
+.brand span{font-size:.8rem;color:var(--muted)}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;background:var(--glass);border:1px solid var(--glass-line);border-radius:999px;padding:3px}
+.tabs button{flex:1 0 auto;background:none;border:0;border-radius:999px;padding:7px 14px;color:var(--muted);font-weight:500;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--ink-fg)}
+main{padding-block:18px;display:flex;flex-direction:column;gap:16px}
+
+/* surfaces */
+.card{background:var(--glass);border:1px solid var(--glass-line);border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0;
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);box-shadow:0 22px 40px -28px var(--shadow)}
+.card.flat{background:var(--glass);border-color:transparent;box-shadow:none;border-radius:20px;padding:14px 16px}
+.card.dark{background:var(--dark);color:var(--dark-fg);border-color:transparent}
+.card.dark .muted{color:var(--dark-muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.stack{display:flex;flex-direction:column;gap:10px;min-width:0}
+button.card{font:inherit;color:inherit;text-align:left;cursor:pointer}
+button.card:hover{background:var(--glass-hi)}
+
+/* buttons */
+.btn{background:var(--glass-hi);border:1px solid var(--edge);border-radius:999px;padding:8px 18px;font-weight:500;cursor:pointer;min-height:40px;color:var(--fg)}
+.btn:hover{border-color:var(--fg)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}
+.btn.primary:hover{opacity:.88}
+.btn.sm{padding:3px 13px;min-height:32px;font-size:.86rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.go{display:inline-flex;align-items:center;gap:12px;padding-right:5px}
+.btn.go::after{content:"›";display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--bg);color:var(--fg);font-size:1.2rem;line-height:1;padding-bottom:2px}
+.card.dark .btn.primary{background:var(--dark-fg);color:var(--dark);border-color:var(--dark-fg)}
+.card.dark .btn.go::after{background:var(--dark);color:var(--dark-fg)}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--edge);background:var(--glass-hi);border-radius:999px;padding:4px 13px;font-size:.86rem;cursor:pointer;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}
+.chip[aria-pressed="true"] .muted{color:inherit;opacity:.65}
+.tag{display:inline-block;font-size:.76rem;font-weight:500;padding:2px 10px;border-radius:999px;background:var(--glass-hi);color:var(--muted);border:1px solid var(--edge)}
+.tag.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.tag.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.tag.acc{background:var(--orange-soft);color:var(--orange);border-color:transparent}
+textarea,.in{width:100%;background:var(--glass-hi);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;color:var(--fg)}
+textarea{border-radius:22px;min-height:150px;resize:vertical;font-size:1.05rem;line-height:1.7;padding:14px 18px}
+textarea:focus,.in:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px var(--orange-soft)}
+select.in{padding:6px 14px}
+details>summary{cursor:pointer;font-weight:500}
+details>summary::marker{color:var(--orange)}
+
+/* progress bits */
+.bar{height:6px;border-radius:99px;background:var(--edge);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--orange);border-radius:99px}
+.pips{display:flex;gap:4px}
+.pips i{width:18px;height:5px;border-radius:3px;background:var(--edge)}
+.pips i.on{background:var(--orange)}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:2.3rem;font-weight:300;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums}
+.check{display:flex;gap:12px;align-items:flex-start}
+.check .box{flex:0 0 22px;height:22px;border-radius:50%;border:1.5px solid var(--muted);margin-top:2px;display:grid;place-items:center;font-size:.78rem;font-weight:600}
+.check.done .box{background:var(--ok);border-color:var(--ok);color:#fff}
+.check.done .t{color:var(--muted);text-decoration:line-through}
+
+/* today hero */
+.hero{display:grid;grid-template-columns:minmax(150px,.9fr) 1.1fr;gap:0;background:var(--glass-hi);border:1px solid var(--glass-line);border-radius:28px;overflow:hidden;position:relative;box-shadow:0 22px 40px -28px var(--shadow)}
+.hero-date{position:relative;padding:22px;display:flex;flex-direction:column;gap:2px;background:var(--glass);min-height:280px;overflow:hidden}
+.hero-date b{font-size:3rem;font-weight:300;letter-spacing:-.03em;line-height:1}
+.hero-date b.dim{color:var(--muted)}
+.hero-date .orb{position:absolute;right:-95px;top:30%;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--orange),var(--orange) 40%,transparent 72%);filter:blur(10px);opacity:.9}
+.hero-date .meta{margin-top:auto;position:relative;font-size:.9rem;line-height:1.5}
+.hero-right{padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:16px;align-items:flex-end;text-align:right;position:relative;overflow:hidden}
+.hero-right p{max-width:68%}
+.hero-right .sun{position:absolute;left:-95px;top:30%;width:190px;height:190px;border-radius:50%;background:linear-gradient(160deg,var(--orange),#F5A15F);opacity:.95}
+.hero-right p,.hero-right .btn{position:relative}
+@media (max-width:520px){.hero{grid-template-columns:1fr}.hero-date{min-height:220px}.hero-right{align-items:flex-start;text-align:left}.hero-right p{max-width:none}.hero-right .sun{display:none}}
+
+/* writing */
+.lv{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.lv button{flex:1 0 auto;border:1px solid var(--edge);background:var(--glass-hi);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:500;font-size:.88rem;white-space:nowrap}
+.lv button[aria-selected="true"]{background:var(--ink);color:var(--ink-fg);border-color:var(--ink)}
+.lv button.done:not([aria-selected="true"]){border-color:var(--ok);color:var(--ok)}
+.model{background:var(--glass);border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.model p{white-space:pre-line}
+input.blank{font:inherit;font-size:1rem;border:0;border-bottom:2px solid var(--orange);background:var(--orange-soft);color:var(--fg);padding:0 6px;border-radius:8px 8px 0 0;text-align:center;min-width:2.5ch;max-width:100%}
+input.blank.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.blank.bad{border-color:var(--bad);background:var(--bad-soft)}
+.cloze{line-height:2.4}
+.wc{font-size:.9rem;font-variant-numeric:tabular-nums;color:var(--muted)}
+.wc.ok{color:var(--ok)} .wc.warn{color:var(--warn)}
+.timer{font-size:2.2rem;font-weight:300;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.timer.low{color:var(--bad)}
+.sent{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center}
+.sent .op{font-weight:600;white-space:nowrap}
+.cmp{background:var(--ok-soft);border-radius:16px;padding:8px 14px;font-size:.98rem;grid-column:1/-1}
+.err{display:grid;grid-template-columns:1fr;gap:2px;border-left:3px solid var(--orange);padding:4px 0 4px 12px}
+.err .o{color:var(--bad);text-decoration:line-through}
+.err .f{color:var(--ok);font-weight:600}
+ul.tight{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+
+/* oral */
+.cue{font-size:1.5rem;font-weight:300;line-height:1.4;letter-spacing:-.01em}
+.answer{font-size:1.12rem;line-height:1.7;background:var(--ok-soft);border-radius:20px;padding:14px 18px}
+
+/* drill */
+.drow{display:grid;grid-template-columns:7.5rem 1fr 1.6rem;gap:10px;align-items:center}
+.drow label{text-align:right;color:var(--muted)}
+.drow .in{font-size:1.05rem;padding:7px 16px}
+.drow .in.ok{border-color:var(--ok);background:var(--ok-soft)}
+.drow .in.bad{border-color:var(--bad);background:var(--bad-soft)}
+.drow .mk{font-weight:600}
+.drow .corr{grid-column:2/-1;color:var(--ok);font-weight:600;font-size:.95rem}
+.vgrid{display:flex;flex-wrap:wrap;gap:6px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--edge);vertical-align:top;font-size:.9rem}
+th{color:var(--muted);font-weight:500;font-size:.8rem}
+.scroll{overflow-x:auto}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ink-fg);padding:9px 20px;border-radius:999px;font-weight:500;font-size:.9rem;z-index:20;max-width:90vw}
+@media (max-width:520px){
+  .drow{grid-template-columns:5.2rem 1fr 1.4rem}
+  .sent{grid-template-columns:1fr}
+  .card{padding:18px;border-radius:24px}
+  h2{font-size:1.6rem}
+}
+@media (prefers-reduced-motion:no-preference){ .bar>i{transition:width .3s} }
+</style>
+
+<div class="top"><div class="wrap">
+  <div class="brand"><b>Cahier TCF</b><span id="countdown"></span></div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
+</div></div>
+<div class="wrap"><main id="main" aria-live="polite"></main></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const DATA = {"writing": [{"id": "w1-0", "task": 1, "title": "Message à des amis : événement sportif", "prompt": "Vous participez à un événement sportif dans votre ville. Écrivez un message à vos amis pour les informer (date, lieu, activités).", "points": ["Tell your friends you're taking part in a sports event", "Date and place (Saturday, central park, from 10 a.m.)", "What's on: running, football and basketball, yoga, food and drink stalls", "Invite them to come along"], "model": "Bonjour les amis,\n\nJe voulais vous informer que je participe à un événement sportif dans notre ville le samedi 12 mars prochain. L'événement se déroulera au parc central à partir de 10 heures du matin.\n\nIl y aura de nombreuses activités intéressantes telles que des courses à pied, des matchs amicaux de football et de basketball, ainsi que des séances de yoga et de fitness en plein air. En plus des activités sportives, il y aura aussi des stands de rafraîchissements et de restauration.\n\nJ'espère que vous pourrez venir et partager cette expérience sportive avec moi.\n\nA bientôt,\nNeo"}, {"id": "w1-2", "task": 1, "title": "Proposer un jogging", "prompt": "Vous proposez à une amie de faire du jogging avec vous le matin. Écrivez-lui un message.", "points": ["Greet her and suggest jogging together every morning", "Reason: you live close, run around the lake", "The setting: great view, fresh air", "Ask what she thinks, wait for her reply"], "model": "Salut Estelle,\n\nComment vas-tu ?\n\nJe me demandais si tu serais intéressée par une séance de jogging avec moi le matin. Comme nous habitons toutes les deux à Burnaby, ce serait une excellente idée de faire une demi-heure de jogging autour du lac Deer Lake chaque matin avant d’aller travailler.\n\nCet environnement offre une vue magnifique et de l’air frais, parfait pour bien commencer la journée. Ce serait non seulement une excellente façon de rester en forme, mais aussi une belle opportunité de passer un moment agréable ensemble. Qu'en penses-tu ? J’attends ta réponse.\n\nÀ très bientôt!\nNeo"}, {"id": "w1-7", "task": 1, "title": "Festival de cinéma", "prompt": "Vous invitez un(e) ami(e) à un festival de cinéma organisé dans votre ville. Donnez-lui toutes les informations (dates, programme, prix, horaires, lieu).", "points": ["Invite your friend to the film festival, give the dates (May 1 to 7)", "Programme: many genres and countries, full schedule on the official site", "Price: 10 euros per screening", "Times and place: from 10 a.m. daily, at the city-centre cinema"], "model": "Salut Éric,\n\nJ'ai le plaisir de t'inviter au festival de cinéma qui aura lieu dans notre ville du 1er au 7 mai.\n\nCet événement proposera une sélection variée de films provenant de différents genres et pays. Le programme détaillé est disponible sur le site officiel du festival. Le prix d'entrée pour une séance est de 10 euros.\n\nLes projections débuteront chaque jour à partir de 10h du matin et se poursuivront jusqu'en soirée. Elles auront lieu au cinéma municipal, en plein cœur du centre-ville. J'espère que tu pourras te joindre à nous pour cette semaine immersive de cinéma ! N'hésite pas à me contacter si tu as besoin de plus d'infos.\n\nCordialement,\nNeo"}, {"id": "w1-13", "task": 1, "title": "Anniversaire surprise", "prompt": "Vous invitez vos amis à une fête d'anniversaire surprise pour un ami commun. Écrivez-leur un message.", "points": ["Invite everyone to a surprise birthday party for a friend", "When and where: March 20, 7 p.m., in the garden", "Plan: games and activities, a shared gift", "Ask them to contact you for details, say you hope they can come"], "model": "Chers amis,\n\nJ'espère que vous allez bien ! Je vous écris aujourd'hui pour vous inviter à une fête d'anniversaire surprise pour notre ami commun, Jean.\n\nLa fête aura lieu le samedi 20 mars à partir de 19 heures dans notre jardin. Nous organiserons des jeux et des activités amusants tout au long de la soirée et nous avons prévu un cadeau commun pour Jean.\n\nNous espérons que vous pourrez tous venir célébrer l'anniversaire de Jean avec nous. Si vous avez besoin de plus de détails, n'hésitez pas à nous contacter. Merci d'avance et à très bientôt !\n\nCordialement,\nNeo"}, {"id": "w1-20", "task": 1, "title": "Soirée de fin d'année", "prompt": "Vous invitez vos amis à une soirée de fin d'année chez vous. Écrivez-leur un message.", "points": ["Invite everyone to an end-of-year party at your place, give the date", "Purpose: relax, laugh, enjoy good moments", "You provide food and drinks, guests may bring something to share", "Ask them to confirm their attendance soon"], "model": "Salut à tous,\n\nJ'espère que vous allez bien ! Comme la fin de l'année approche, je me suis dit qu'il serait génial de tous nous retrouver pour célébrer ensemble. Je vous invite donc à une soirée de fin d'année chez moi le 5 Mai, à partir de 10h.\n\nCe sera l'occasion de décompresser, de rire et de profiter de bons moments avant de plonger dans la nouvelle année. Je prévoirai de la nourriture et des boissons, mais n'hésitez pas à apporter aussi quelque chose à partager !\n\nMerci de me confirmer votre présence dès que possible, pour que je puisse organiser au mieux.\n\nHâte de vous voir tous pour une super soirée !\n\nBises,\nNeo"}, {"id": "w1-28", "task": 1, "title": "Se déplacer en ville", "prompt": "Un ami arrive dans votre ville. Écrivez-lui pour lui expliquer comment se déplacer (moyens de transport, prix).", "points": ["Welcome your friend to the city", "Transport: bus and tram are the most practical and cheapest", "Prices: single ticket about 1.50 euros, monthly pass about 40 euros, unlimited", "Offer more advice if needed"], "model": "Salut Mehdi,\n\nBienvenue dans notre ville! Je suis ravi que tu sois là et je suis sûr que tu vas vite te sentir chez toi. Concernant les transports, tu as pas mal d'options pour te déplacer. Les bus et le tramway sont les moyens les plus pratiques et économiques pour parcourir la ville. Un ticket simple coûte environ 1,50 €, mais si tu comptes les utiliser souvent, je te recommande de prendre un abonnement mensuel qui est aux alentours de 40 €. Cela te donne un accès illimité à tout le réseau de transport en commun.\n\nSi tu as besoin de conseils supplémentaires, n'hésite pas à me le faire savoir. Je serais ravi de t'aider à mieux connaître les options de transport ici.\n\nÀ très bientôt,\nNeo"}, {"id": "w1-31", "task": 1, "title": "Inviter dans ma nouvelle ville", "prompt": "Vous venez de déménager dans une nouvelle ville. Écrivez à un ami pour l'inviter à venir passer quelques jours chez vous.", "points": ["Greet your friend, say you've moved to Vancouver and settled in well", "The city has plenty to see and do: parks, museums, restaurants", "You'd love to explore together and catch up", "Ask when he's free"], "model": "Salut Eric,\n\nJ'espère que tout va bien pour toi ! Comme tu le sais, j’ai récemment déménagé à Vancouver et je dois dire que c'est un endroit fantastique. Je me suis bien installé(e) et j'aimerais vraiment que tu viennes passer quelques jours de vacances avec moi. Il y a tant à voir et à faire ici, des parcs paisibles aux musées intéressants, sans oublier les bons petits restaurants du coin.\n\nCe serait génial de pouvoir explorer la ville ensemble et de rattraper le temps perdu. Tu es libre quand ? Dis-moi tes disponibilités et préparons-nous pour de superbes moments.\n\nÀ très bientôt j'espère !\n\nBises,\nNeo"}, {"id": "w1-36", "task": 1, "title": "Un hôtel pour les vacances", "prompt": "Vous avez trouvé un hôtel pour vos prochaines vacances. Écrivez à vos amis pour le leur présenter (situation, chambres, prix).", "points": ["Tell everyone you've found a great hotel", "Location: a few minutes from the beach, quiet area", "Rooms: spacious, bright, well equipped", "Price is reasonable; recommend booking soon"], "model": "Chers amis,\n\nJe suis très heureux de partager avec vous que j'ai trouvé un super hôtel pour nos prochaines vacances .\n\nCet hôtel est situé à quelques minutes de la plage, dans un quartier calme et agréable. Les chambres sont spacieuses, lumineuses et très bien équipées avec tout ce dont nous avons besoin pour notre confort. Le prix est également très raisonnable par rapport à la qualité de l'hôtel et de ses équipements.\n\nJe vous recommande vivement de réserver cet hôtel dès que possible avant qu'il ne soit complet. Je suis sûr que nous allons passer des moments inoubliables ensemble.\n\nBien à vous,\nNeo"}, {"id": "w1-41", "task": 1, "title": "Garder ma maison", "prompt": "Un ami garde votre maison et votre jardin pendant vos vacances. Écrivez-lui ce qu'il doit savoir.", "points": ["Thank him for looking after the house and garden", "Garden: water the plants every two days, especially the pots on the terrace", "Mail: collect it daily, bring parcels inside", "Tell him to make himself at home and to contact you with questions"], "model": "Salut Cédric,\n\nMerci encore de t’occuper de la maison et du jardin pendant que nous sommes en vacances, c’est vraiment super sympa de ta part ! Voici quelques petites choses à savoir pour que tout se passe bien: Concernant le jardin, il serait super si tu pouvais arroser les plantes tous les deux jours, surtout les pots sur la terrasse qui ont tendance à se dessécher rapidement. Pour le courrier, il suffit de le relever quotidiennement et de rentrer les colis à l'intérieur pour qu'ils ne restent pas dehors.\n\nN’hésite pas à faire comme chez toi et à me contacter si tu as des questions.\n\nÀ bientôt!\nNeo"}, {"id": "w1-45", "task": 1, "title": "Mon entretien d'embauche", "prompt": "Racontez à un(e) ami(e) comment s'est passé votre entretien d'embauche.", "points": ["Tell your friend the interview went well overall", "What happened: company presentation, met your future manager, discussed your experience and skills", "At the end you asked questions about the company and the job", "Now waiting for an answer; thank your friend for the support"], "model": "Cher(e) ami(e),\n\nJe voulais te raconter comment s'est déroulé mon entretien d'embauche aujourd'hui. Dans l'ensemble, je pense que cela s'est bien passé !\n\nL'entretien a commencé par une présentation de l'entreprise et de son histoire. Ensuite, j'ai rencontré mon futur responsable et nous avons discuté en détail de mes expériences passées et de mes compétences. En fin d'entretien, j'ai également eu l'opportunité de poser des questions sur l'entreprise et le poste. Mon responsable a répondu à toutes mes questions avec patience et clarté.\n\nJe suis maintenant dans l'attente d'une réponse de leur part. Je te tiendrai au courant de la suite. Merci encore pour ton soutien et tes encouragements.\n\nÀ bientôt,\nNeo"}, {"id": "w1-47", "task": 1, "title": "Un nouveau travail", "prompt": "Annoncez à un ami que vous avez trouvé un nouveau travail. Décrivez le bureau et vos collègues.", "points": ["Announce you got a new job (data analyst)", "The office: in a lively new district full of cafés and green spaces", "Colleagues: a dynamic, diverse, warm team", "Looking forward to starting; arrange to meet and tell him everything"], "model": "Salut Cédric,\n\nJe suis tellement enthousiaste de t'annoncer que j'ai décroché un nouveau job ! Après des mois de recherches, j'ai finalement été embauchée en tant que analyste de données chez XXX.\n\nLe bureau est absolument incroyable; il est situé dans un nouveau quartier dynamique de la ville, plein de cafés et d'espaces verts. Mes nouveaux collègues sont une équipe dynamique et diverse, venant de divers horizons professionnels. L'ambiance est très chaleureuse et tout le monde semble vraiment impliqué dans son travail.\n\nJe suis vraiment impatiente de commencer ce nouveau chapitre de ma vie professionnelle et de voir où cela va me mener. On doit absolument se voir pour que je te raconte tout en détail!\n\nÀ très bientôt,\nNeo"}, {"id": "w1-52", "task": 1, "title": "Vendre mon vélo", "prompt": "Vous avez un vélo à vendre. Écrivez un courriel pour le décrire, proposer un prix et donner un rendez-vous pour l'essayer.", "points": ["Answer the ad: say you have the right bike", "Describe it: city bike in very good condition, gears, disc brakes, rear rack, aluminium frame", "Price: 150 euros, slightly negotiable", "Suggest a time to try it out and ask them to contact you"], "model": "Bonjour Mathieu,\n\nJ'ai vu votre annonce concernant la recherche d'un vélo et je pense avoir ce qu'il vous faut. Je propose un vélo de ville en très bon état, parfait pour des trajets quotidiens ou des balades en weekend. Il est équipé de vitesses Shimano, de freins à disque, et d'un porte-bagages arrière. Le cadre est en aluminium, ce qui le rend léger et maniable.\n\nJe vous propose ce vélo pour 150 euros, légèrement négociable. Si vous êtes intéressé, nous pourrions convenir d'un rendez-vous pour que vous puissiez l'essayer et voir s'il répond à vos attentes.\n\nMerci de me contacter à votre convenance pour organiser cela.\n\nCordialement,\nNeo"}, {"id": "w2-0", "task": 2, "title": "Une soirée écologique", "prompt": "Écrivez un article pour le journal de votre université : racontez une soirée écologique à laquelle vous avez assisté.", "points": ["Last night you attended an ecology evening at your university; it was inspiring", "It began with a talk by ecology experts on today's challenges and everyday solutions", "Then practical workshops: eco-friendly cleaning products, creative recycling, cutting your carbon footprint", "Conclusion: it opened your eyes; you hope more events like this are organised"], "model": "Chers Lecteurs :\n\nHier soir, j'ai eu la chance d'assister à une soirée écologique organisée dans mon université, et je dois dire que cela était une expérience incroyablement enrichissante et inspirante!\n\nLa soirée a débuté par une conférence passionnante animée par des experts en écologie, qui nous ont parlé des défis environnementaux actuels et des solutions que chacun peut adopter au quotidien. Ensuite, plusieurs ateliers pratiques étaient proposés, comme la fabrication de produits ménagers écologiques, le recyclage créatif ou encore des astuces pour réduire notre empreinte carbone.\n\nEn conclusion, cette soirée m'a ouvert les yeux sur de nombreux aspects de la transition écologique et m'a donné des idées concrètes pour adopter un mode de vie plus respectueux de la planète. J'espère que mon université organisera d'autres événements comme celui-ci, car ils sont essentiels pour sensibiliser et encourager les actions positives.\n\nMerci de m'avoir lu,\nNeo"}, {"id": "w2-1", "task": 2, "title": "Un cours de cuisine", "prompt": "Racontez dans un article votre expérience d'un cours de cuisine auquel vous avez participé.", "points": ["Last week you took a cooking class: enriching and delicious", "Warm, friendly atmosphere; a well-equipped kitchen, each person at their own station", "The chef first explained the menu: starter, main course, dessert", "Result: more confidence, new techniques; you recommend it"], "model": "Chers lecteurs,\n\nLa semaine dernière, j'ai eu l'opportunité de participer à un cours de cuisine et je dois dire que ce fut une expérience aussi enrichissante que délicieuse!\n\nDès mon arrivée, l'ambiance était chaleureuse et conviviale. Le cours s'est déroulé dans une grande cuisine équipée, où chaque participant disposait de son propre plan de travail. Notre chef, un véritable passionné, nous a d'abord expliqué le menu du jour : une entrée légère, un plat principal raffiné et un dessert gourmand. Chaque étape était bien expliquée et j'ai été surpris(e) de voir à quel point certains gestes de professionnels peuvent faire toute la différence !\n\nCe cours m'a permis de gagner en confiance en cuisine et d'apprendre de nouvelles techniques que je vais sans aucun doute réutiliser chez moi. Je recommande vivement cette expérience à tous ceux qui veulent progresser en cuisine. Merci de m'avoir lu,\n\nNeo"}, {"id": "w2-2", "task": 2, "title": "Vivre à la campagne", "prompt": "Vous avez quitté la ville pour la campagne. Racontez votre expérience dans un article.", "points": ["Say you recently left the city for the countryside", "The setting: peaceful, no traffic or pollution, clean air", "Property is cheaper: a big house with a garden, you grow your own vegetables", "Conclusion: great quality of life, you recommend it"], "model": "Chers lecteurs,\n\nJ’espère que vous allez bien.\n\nComme je l’ai mentionné dans mon dernier article de blog, j’ai récemment quitté la ville pour m’installer à la campagne, et j’aimerais partager avec vous les expériences incroyables que j’ai vécues depuis ce changement.\n\nTout d’abord, la campagne offre un cadre de vie paisible, loin des embouteillages et de la pollution urbaine. L’air pur et le calme ambiant favorisent un mode de vie plus sain et serein. De plus, le coût de l’immobilier y est bien plus abordable, ce qui m’a permis d’acquérir une maison spacieuse avec un grand jardin. J’y cultive désormais mes propres fruits et légumes, une activité qui contribue non seulement à mon bien-être, mais aussi à ma santé.\n\nVivre à la campagne est une expérience enrichissante que je recommande vivement à tous. Ce mode de vie offre une qualité de vie incomparable et mérite vraiment d’être découvert.\n\nMerci de m'avoir lu,\nNeo"}, {"id": "w2-8", "task": 2, "title": "La fête de mon quartier", "prompt": "Racontez la fête annuelle de votre quartier à laquelle vous avez assisté.", "points": ["Yesterday you attended your neighbourhood's annual party", "Atmosphere: the street became a party space, neighbours brought a variety of dishes", "A local band played live, everyone danced and laughed, neighbours shared stories", "What you took from it: you know your neighbours better and feel more connected"], "model": "Bonjour à tous,\n\nHier, j'ai assisté à la fête annuelle de notre quartier, un événement qui a réellement enrichi mon appréciation pour ma communauté locale. L'ambiance était incroyablement chaleureuse, la rue transformée en espace festif, avec des tables débordant de plats variés apportés par les résidents, reflétant la diversité culinaire du quartier.\n\nUn groupe local a animé la soirée avec de la musique live, créant une atmosphère détendue qui a rassemblé tout le monde en danses et rires. Ce que j'ai le plus apprécié, ce sont les échanges avec mes voisins. Chacun partageait des histoires et des anecdotes, renforçant notre sentiment de communauté.\n\nCette expérience m'a non seulement permis de mieux connaître les gens qui vivent autour de moi, mais aussi de me sentir plus connecté à mon environnement immédiat. Vivement la prochaine fête pour renforcer encore ces liens précieux !\n\nCordialement,\nNeo"}, {"id": "w2-9", "task": 2, "title": "La Fête des Lanternes", "prompt": "Présentez une fête traditionnelle à laquelle vous avez participé.", "points": ["Recently you took part in the Lantern Festival, the end of the Chinese New Year celebrations", "When: the fifteenth day of the first lunar month", "What makes it special: lit lanterns floating in the night sky, a symbol of hope and renewal", "Food: tangyuan, symbolising reunion; you felt part of a community and a living culture"], "model": "Chers lecteurs,\n\nRécemment, j'ai eu l'immense joie d'assister à la Fête des Lanternes en Chine, une expérience inoubliable qui marque la fin des célébrations du Nouvel An chinois. L'événement est célébré le quinzième jour du premier mois lunaire et apporte une clôture lumineuse et joyeuse aux festivités prolongées.\n\nCe qui rend cette fête si spéciale, c’est le spectacle des lanternes illuminées flottant dans le ciel nocturne. Chaque lanterne, avec ses lumières vacillantes, semble emporter les souhaits et les rêves vers les étoiles. C'est une vue vraiment magique, symbolisant l'espoir et le renouveau.\n\nJ'ai également adoré les tangyuans, ces délicieuses boulettes de riz gluant servies en bouillon sucré, symbolisant l'union et la prospérité. Participer à cette fête m'a permis de ressentir un profond sentiment de communauté et de continuité culturelle. La Fête des Lanternes n'est pas seulement belle à voir; elle enrichit l'esprit, ce qui explique pourquoi je l'ai tant aimée.\n\nCordialement,\nNeo"}, {"id": "w2-11", "task": 2, "title": "Un concert inoubliable", "prompt": "Racontez un concert auquel vous avez assisté.", "points": ["A few days ago you saw your favourite artist in concert, one of the best experiences of your life", "At the start he played his biggest hits and the crowd sang and danced", "The lights and special effects were stunning", "Conclusion: strongly recommended, unforgettable"], "model": "Chers lecteurs,\n\nIl y a quelques jours, j'ai eu la chance d'assister au concert de Zhou Shen, mon artiste préféré, et je dois dire que cela a été l'une des meilleures expériences de ma vie. La musique, les lumières, l'ambiance - tout était parfait. J'ai été emporté par l'énergie incroyable de la foule et de l'artiste.\n\nDès le début du concert, j'ai été impressionné par le talent et la passion de l'artiste. Il a commencé avec quelques-uns de ses plus grands succès, et la foule a immédiatement commencé à chanter et à danser avec lui. Les lumières et les effets spéciaux étaient tout simplement époustouflants, créant une ambiance vraiment magique.\n\nEn somme, je recommande vivement le concert de cet artiste. C'est un événement que je n'oublierai jamais, et je suis sûr que ceux qui y assisteront seront tout aussi enchantés que moi.\n\nCordialement,\nNeo"}, {"id": "w2-13", "task": 2, "title": "Ma première semaine de travail", "prompt": "Racontez à vos amis votre première semaine dans votre nouveau travail.", "points": ["Tell your friends about your first week in the new job", "You met colleagues and the boss, and had a tour of the company", "Then you got used to your responsibilities: some projects were hard at first, team meetings", "Overall excited; you'll keep them posted"], "model": "Chers amis,\n\nJ'espère que vous allez bien. Je voulais vous raconter comment s'est passée ma première semaine dans mon nouveau travail.\n\nTout d'abord, j'ai rencontré mes nouveaux collègues et mon patron. Ils sont tous très sympathiques et accueillants. J'ai également eu une visite guidée de l'entreprise, ce qui m'a aidé à comprendre le fonctionnement de la société et à savoir où se trouvent les différents services.\n\nEnsuite, j'ai commencé à m'habituer à mes nouvelles responsabilités. J'ai travaillé sur quelques projets qui étaient un peu difficiles au début, mais j'ai rapidement compris comment les aborder. J'ai également assisté à plusieurs réunions avec l'équipe pour discuter de notre stratégie et de nos objectifs à court et à long terme. Dans l'ensemble, je suis très enthousiaste pour ce nouveau poste et j'ai hâte de voir ce que l'avenir me réserve.\n\nJe vous tiendrai informé de mes progrès dans mon nouveau travail!\n\nCordialement,"}, {"id": "w2-15", "task": 2, "title": "Travailler pendant les congés", "prompt": "Racontez votre expérience de travail pendant vos congés.", "points": ["This year you worked during your holidays to gain skills and earn extra money", "A month in an online-sales company, marketing department", "You learned digital tools to promote products and built communication, organisation and problem-solving skills", "Recommend everyone try it"], "model": "Chers amis,\n\nCette année, j'ai décidé de travailler pendant mes congés pour acquérir de nouvelles compétences et pour gagner un peu d'argent supplémentaire. J'ai travaillé pendant un mois dans une entreprise de vente en ligne, et cela a été une expérience incroyable que je suis ravie de partager avec vous.\n\nJ'ai travaillé dans le département marketing de l'entreprise, où j'ai pu apprendre à utiliser des outils numériques pour promouvoir des produits en ligne. Travailler dans un environnement professionnel a été très différent de mon travail habituel, mais cela m'a permis de développer mes compétences en communication, en organisation et en résolution de problèmes.\n\nEn résumé, je recommande à tout le monde d'essayer de travailler pendant leurs vacances, car cela peut être une expérience très enrichissante.\n\nMerci de m'avoir lu et à bientôt !"}, {"id": "w2-22", "task": 2, "title": "Ma première semaine à l'université", "prompt": "Écrivez à une amie pour lui raconter votre première semaine à l'université.", "points": ["Tell your friend about your first week at university in Montréal", "You're happy and feel you're in the right place; the campus is huge", "Interesting classes, great professors, more demanding than high school", "Only downside: getting lost on campus at first"], "model": "Chère Estelle,\n\nJe voulais te donner des nouvelles de ma première semaine à l'université à Montréal ! Tout d'abord, je suis tellement heureux(se) d'être ici et j'ai vraiment l'impression que je suis au bon endroit. L'université est immense et il y a tellement de choses à découvrir.\n\nJ'ai assisté à plusieurs cours intéressants et j'ai déjà rencontré des professeurs géniaux. J'ai été impressionné(e) par l'organisation des cours et la qualité de l'enseignement. Les cours sont plus exigeants que ceux du lycée, mais je suis motivé(e) à travailler dur pour réussir.\n\nLe seul point négatif, c'est que j'ai eu du mal à me retrouver dans le campus au début, c'est tellement grand !\n\nDans l'ensemble, je suis très heureux(se) de mon choix. J'ai hâte de te donner plus de détails sur mes aventures universitaires et j'espère te revoir bientôt ! Amicalement,"}, {"id": "w2-25", "task": 2, "title": "Quitter les réseaux sociaux", "prompt": "Expliquez à vos amis pourquoi vous avez décidé de ne plus utiliser les réseaux sociaux.", "points": ["After long thought you decided to stop using social media", "Reason 1: refocus on what matters, away from noise and distraction", "Reason 2: want more authentic face-to-face interaction", "Reason 3: protect your privacy and mental health"], "model": "Chers amis,\n\nAprès une longue réflexion, j'ai décidé de ne plus utiliser les réseaux sociaux comme Twitter, Instagram, Facebook, et autres. Cette décision n'a pas été facile à prendre, mais elle est motivée par plusieurs raisons importantes pour moi.\n\nTout d'abord, je ressens le besoin de me recentrer sur l'essentiel et de prendre du temps pour moi-même, loin du bruit constant et des distractions que les réseaux sociaux peuvent provoquer. Ensuite, je veux me concentrer sur des interactions plus authentiques et significatives, en privilégiant les relations en face à face ou par des moyens de communication plus personnels. Enfin, je crois qu'il est important de protéger ma vie privée et de réduire l'impact des technologies sur ma santé mentale. J'espère que vous comprenez cette décision, et j'ai hâte de continuer à échanger avec vous par d'autres moyens.\n\nÀ bientôt,\nNeo"}, {"id": "w3-0", "task": 3, "title": "Jeux vidéo et enfants", "prompt": "Les jeux vidéo ont-ils un effet positif ou négatif sur les enfants ? Exprimez votre opinion.", "points": ["Introduce the topic: video games and children is a heated debate", "Two views: they cause negative thoughts and aggression vs. they benefit the brain", "Your position: video games are addictive and children lack self-control", "Reasons: eyesight and health, less social contact, neglected duties; conclusion: limit playing time"], "model": "Si les jeux vidéo ont un effet positif ou négatif sur les enfants, cela fait l'objet d'un débat passionné au sein de notre société. Certaines personnes estiment qu'une exposition régulière aux jeux vidéo peut engendrer des pensées négatives et favoriser des comportements agressifs. D'autres, en revanche, considèrent que ces jeux offrent divers bénéfices pour le fonctionnement cérébral.\n\nDans ce débat, il est essentiel de rappeler que les jeux vidéo sont addictifs. Les enfants et les adolescents, dont le contrôle de soi n'est pas encore pleinement développé, peuvent aisément passer de longues heures devant les écrans, ce qui risque d'affecter leur vue ainsi que leur santé globale. De plus, un temps excessif consacré aux écrans limite leurs interactions sociales et peut nuire à l'accomplissement de leurs responsabilités, impactant ainsi leur développement personnel sur le long terme. Il est donc essentiel de restreindre autant que possible la durée qu'ils consacrent aux jeux vidéo."}, {"id": "w3-1", "task": 3, "title": "L'uniforme à l'école", "prompt": "Faut-il porter l'uniforme à l'école ? Exprimez votre opinion.", "points": ["Introduce the topic: school uniforms divide opinion", "Two views: belonging and equality vs. limits on expression and individuality", "Your position: support uniforms, school is a place to learn", "Reasons: pupils focus on study not appearance; discipline, easier for teachers to manage"], "model": "La question de l'uniforme à l'école suscite un débat passionné au sein de notre société. Certaines personnes estiment que le port de l’uniforme renforce le sentiment d’appartenance et favorise l’égalité entre les élèves, tandis que d’autres considèrent qu’il restreint la liberté d’expression et empêche les étudiants d’affirmer leur individualité. Dans ce débat, il est essentiel de rappeler que l'école est un environnement conçu pour faciliter l'apprentissage des élèves, qui doivent y consacrer toute leur énergie à absorber et à appliquer les connaissances acquises. L’instauration d’un uniforme scolaire, en imposant une tenue vestimentaire homogène, aide les élèves à se focaliser davantage sur leurs études plutôt que sur leur apparence. De plus, le port de l’uniforme peut renforcer la discipline en facilitant la gestion des élèves par les enseignants. En effet, une tenue uniforme rend le suivi des élèves plus aisé par rapport à des vêtements variés, contribuant ainsi à un environnement d’apprentissage plus calme et propice à la réussite."}, {"id": "w3-2", "task": 3, "title": "Les devoirs à la maison", "prompt": "Les devoirs à la maison sont-ils utiles ? Exprimez votre opinion.", "points": ["Introduce the topic: homework has long been debated", "Two views: builds self-discipline and parental involvement vs. unnecessary and widens inequality", "Your position: homework is a valuable chance to consolidate learning", "Reasons: independent practice aids understanding; pupils spot their own difficulties and what extra help they need"], "model": "Lles devoirs à la maison fait l'objet d'un débat passionné dans notre société depuis longtemps. Certaines personnes estiment que lles devoirs favorisent le développement de l’autodiscipline chez les élèves et encouragent l’implication des parents dans leur éducation. D’autres, en revanche, s’y opposent en affirmant qu’ils sont superflus et risquent de creuser des inégalités entre les élèves.\n\nDans ce débat, il est essentiel de rappeler que les devoirs à domicile constituent une opportunité précieuse pour les élèves de consolider les compétences acquises en classe. En effet, après une leçon, ils leur permettent de s’exercer de manière autonome, ce qui favorise une meilleure assimilation des concepts essentiels et un approfondissement de leur compréhension des sujets étudiés. De plus, en réalisant des exercices chez eux, les élèves peuvent repérer les points sur lesquels ils rencontrent des difficultés et déterminer les aspects nécessitant des aides supplémentaires."}, {"id": "w3-3", "task": 3, "title": "Interdire les voitures en ville", "prompt": "Faut-il interdire la circulation des voitures dans les centres-villes ? Exprimez votre opinion.", "points": ["Introduce the topic: banning cars in urban areas is debated", "Two views: good for the environment and quality of life vs. doomed without the right tools", "Your position: it's a major challenge, especially in dense areas", "Reasons: without adequate public transport the city could be paralysed; needs big investment in alternatives"], "model": "L’interdiction de la circulation de voitures en zones urbaines fait l'objet d'un débat passionné dans notre société. Certains pensent que ce projet, une fois réalisé, sera très bénéfique pour l’environnement et la qualité de vie des citoyens. D'autres, en revanche, expriment leur réticence en affirmant que sans la mise en œuvre des outils nécessaire, ce projet est voué à l'échec.\n\nDans ce débat, il est essentiel de reconnaître que l'interdiction de la circulation des voitures peut être un défi considérable, en particulier dans les zones urbaines densément peuplées. En effet, sans la mise en place préalable d'un système de transport public adapté aux besoins de déplacement de chacun, une interdiction de la circulation automobile risque de paralyser la ville entière, surtout aux heures de pointe. Par conséquent, la réalisation de ce projet nécessite des investissements significatifs pour développer des alternatives de transport en commun et des aménagements urbains adéquats."}, {"id": "w3-7", "task": 3, "title": "Travailler moins", "prompt": "Faut-il travailler moins pour mieux profiter de la vie ? Exprimez votre opinion.", "points": ["Introduce the topic: working less to enjoy life more is debated", "Two views: more time with loved ones vs. work is part of our identity", "Your position: a balance between work and personal life is needed", "Reasons: shorter hours may mean lower pay; overwork harms physical and mental health and relationships"], "model": "La question de savoir s’il faut travailler moins pour mieux profiter de la vie suscite un débat passionné au sein de notre société. Les partisans avancent que cela nous permet de passer plus de temps avec nos proches, alors que les opposants soutiennent l'importance du travail en faisant valoir qu'il fait partie intégrante de notre identité.\n\nDans cette discussion, je suis fermement convaincu qu'il est crucial d'établir un équilibre entre la vie professionnelle et la vie personnelle. D'un côté, il est essentiel de prendre en compte les implications financières avant de prendre une décision de réduire le temps de travail, car cela peut entraîner une réduction de salaire. D'un autre côté, il est tout aussi important de reconnaître que la recherche montre que des heures de travail excessives peuvent avoir des conséquences néfastes sur notre santé physique et mentale, ainsi que sur nos relations personnelles. Cela souligne donc la nécessité de trouver un équilibre sain entre le travail et la vie personnelle."}, {"id": "w3-9", "task": 3, "title": "Cuisiner chez soi", "prompt": "Vaut-il mieux cuisiner chez soi ou manger au restaurant ? Exprimez votre opinion.", "points": ["Introduce the topic: cooking at home or eating out is debated", "Two views: eating out saves time vs. cooking saves money and shares family moments", "Your position: cooking at home takes a lot of time", "Reasons: prepping and cleaning up are time-consuming for full-time workers; limited skill means repetitive meals"], "model": "La question de cuisiner chez soi fait l’objet d’un débat passionné dans notre société. Certains estiment que manger au restaurant leur permet de gagner du temps tout en ayant une alimentation saine, tandis que d'autres soutiennent que cuisiner chez soi leur permet de réaliser des économies financières tout en partageant des moments conviviaux en famille. Dans ce débat, il est crucial de rappeler que cuisiner chez soi peut prendre du temps, surtout si l'on doit commencer par préparer les ingrédients à partir de zéro ou si l'on cuisine pour plusieurs personnes. Il faut également prendre en compte le temps nécessaire pour nettoyer la cuisine après la préparation des repas. Les personnes qui travaillent à temps plein sont souvent confrontées à une rareté de temps, ce qui peut limiter leur capacité à préparer des repas chez eux. En outre, si l'on n'est pas un cuisinier expérimenté, on peut être limité dans les recettes que l'on peut préparer, ce qui peut conduire à des repas monotones et répétitifs."}, {"id": "w3-11", "task": 3, "title": "Transports en commun gratuits", "prompt": "Les transports en commun doivent-ils être gratuits ? Exprimez votre opinion.", "points": ["Introduce the topic: free public transport is debated", "Two views: less pollution and congestion vs. other priorities, like green spaces", "Your position: it would be a heavy expense for governments", "Reasons: running, maintenance and investment costs are high; without ticket revenue service quality may fall"], "model": "Le sujet de la gratuité des transports en commun est l'objet d'un débat passionné au sein de notre société. D'un côté, certains estiment que la gratuité des transports publics pourrait contribuer à réduire la pollution et les embouteillages, tandis que d'autres considèrent qu’il existe d'autres problèmes, tels que le réaménagement des espaces verts, à prendre en compte comme priorité.\n\nDans ce débat, il est essentiel de rappeler que la mise en place de la gratuité des transports publics peut représenter une dépense importante pour les gouvernements, qui doivent couvrir les coûts de fonctionnement, de maintenance et d'investissement des infrastructures de transport. Cela peut représenter une charge financière considérable, qui pourrait être difficile à supporter pour les budgets publics. En outre, lorsque les transports en commun sont gratuits, il peut y avoir une diminution de la qualité des services offerts, car il n'y a pas de revenus générés par la vente de billets pour financer les investissements nécessaires pour améliorer la qualité de l'infrastructure et des équipements."}, {"id": "w3-13", "task": 3, "title": "Un animal pour les enfants", "prompt": "Faut-il offrir un animal de compagnie aux enfants ? Exprimez votre opinion.", "points": ["Introduce the topic: giving children a pet is debated", "Two views: teaches responsibility and autonomy vs. high costs and a big commitment", "Your position: pets bring many benefits that shouldn't be ignored", "Reason 1: company and emotional support when children feel lonely; reason 2: teaches empathy and caring for others' needs"], "model": "Le sujet de savoir s'il convient de donner un animal de compagnie aux enfants suscite un débat passionné au sein de notre société. Les partisans de cette idée soutiennent que la garde d'un animal domestique pourrait apprendre aux enfants la responsabilité et l'autonomie, tandis que les opposants expriment leur réticence en affirmant que cela implique des coûts élevés et une grande responsabilité.\n\nDans ce débat, il est essentiel de reconnaître que la garde d’un animal domestique présente de nombreux avantages qui ne doivent pas être ignorés. Premièrement, les enfants peuvent se sentir seuls ou isolés à certains moments de leur vie, notamment lorsqu'ils font face à un déménagement, un changement familial ou une distance physique avec leurs parents. Dans ces moments de solitude, les animaux domestiques peuvent offrir une présence inconditionnelle et un soutien émotionnel essentiel pour leur bien-être mental. Deuxièmement, les animaux domestiques peuvent aider à enseigner aux enfants des compétences sociales importantes telles que l'empathie. En prenant soin d'un animal, les enfants apprennent à reconnaître et à répondre aux besoins des autres."}, {"id": "w3-16", "task": 3, "title": "Menu végétarien à la cantine", "prompt": "Faut-il mettre en place un menu végétarien dans les cantines scolaires ? Exprimez votre opinion.", "points": ["Introduce the topic: a vegetarian menu in school canteens is debated", "Two views: good for pupils' health vs. disadvantages poorer families and local producers", "Your position: a balanced diet is essential for pupils' health", "Reasons: young people eat too much meat and need vitamins and fibre; meat has a high carbon footprint, so a vegetarian menu reduces environmental impact"], "model": "La mise en place d'un menu végétarien dans les cantines scolaires est l'objet d'un débat passionné au sein de notre société. Les partisans de cette pratique soutiennent qu'elle serait bénéfique pour la santé des élèves, tandis que les opposants estiment qu'elle pourrait défavoriser les familles en difficulté ainsi que les producteurs locaux.\n\nDans ce débat, il convient de reconnaître que la mise en place d'un régime alimentaire équilibré est fondamentale pour la santé des élèves. À l'heure actuelle, il est constaté que les jeunes consomment une quantité excessive de viande dans leur alimentation, ce qui n'est ni bénéfique pour leur santé, ni pour l'environnement. Il est donc crucial d'intégrer des éléments végétariens dans leur alimentation, afin de leur fournir les nutriments essentiels tels que les vitamines et les fibres. Par ailleurs, la production de viande est souvent associée à une empreinte carbone élevée et à des émissions de gaz à effet de serre. La mise en place d'un menu végétarien peut ainsi contribuer à réduire l'impact environnemental de la cantine scolaire."}, {"id": "w3-18", "task": 3, "title": "Nouvelles technologies et enfants", "prompt": "Les enfants doivent-ils utiliser les nouvelles technologies ? Exprimez votre opinion.", "points": ["Introduce the topic: children's use of new technology is debated", "Two views: supports school development vs. prevents an active, physical life", "Your position: excessive use has negative consequences", "Reasons: eye strain, headaches, insomnia, obesity, addiction; exposure to inappropriate content, so use should be limited and supervised"], "model": "Le sujet de l'utilisation des nouvelles technologies par les enfants est au cœur d'un débat passionné dans notre société. Les partisans de cette pratique soutiennent qu'elle favorise le développement scolaire des enfants, alors que les opposants expriment leur réticence en affirmant que cela peut les empêcher de mener une vie active physiquement.\n\nDans ce débat, il est essentiel de rappeler que l'utilisation excessive des nouvelles technologies, telles que les ordinateurs, les smartphones et les tablettes, peut avoir des conséquences négatives sur la santé des enfants. En effet, elle peut causer des problèmes tels que la fatigue visuelle, les maux de tête, les douleurs musculaires, l'insomnie et l'obésité. Elle peut également entraîner une dépendance, ce qui peut affecter négativement le développement social, émotionnel et cognitif de l'enfant. En outre, les nouvelles technologies peuvent exposer les enfants à des contenus inappropriés, comme la violence, la pornographie et le cyberharcèlement. C’est pour tous ces impacts négatifs qu’il faut limiter et surveiller l’utilisation des nouvelles technologies par les enfants."}], "oral": [{"id": 1, "zh": "Introducing yourself", "fr": "Se présenter", "prio": "Every day", "examples": [{"q": ["Pouvez-vous vous présenter ?", "Quel est votre nom, votre âge, votre nationalité ?"], "a": "Je m'appelle Neo, enfin Zhenzhao Li est mon nom officiel. Je suis chinois, et j'ai actuellement plus de vingt ans. Je vis à Halifax, au Canada, où je suis étudiant en informatique à l'Université Dalhousie."}, {"q": ["Depuis combien de temps êtes-vous au Canada ?"], "a": "Je suis arrivé au Canada il y a quelques années pour mes études. Avant cela, j'ai vécu en Chine, où j'ai fait des études d'économie, puis un master en traduction anglaise."}], "opener": "Je m'appelle Neo, enfin Zhenzhao Li est mon nom officiel.", "follow": []}, {"id": 2, "zh": "Family", "fr": "La famille", "prio": "2–3 times a week", "examples": [{"q": ["Parlez-moi un peu de votre famille."], "a": "Ma famille vit actuellement aux États-Unis. Je suis moi-même au Canada pour mes études, donc nous vivons dans deux pays différents, mais nous nous parlons souvent grâce à internet."}, {"q": ["Avez-vous des frères et sœurs ?"], "a": "Oui, j’ai une sœur aînée. Elle vit aux États-Unis. Elle a maintenant deux petits neveux adorables. Nous discutons souvent en vidéo, de nos vies et des études des enfants."}], "opener": "Ma famille vit actuellement aux États-Unis.", "follow": [{"zh": "And you, where are you?", "a": "Moi, je suis au Canada pour mes études, donc on vit dans deux pays différents."}, {"zh": "How do you stay in touch?", "a": "On se parle très régulièrement grâce à internet, presque tous les jours."}, {"zh": "Has your family visited you / have you been back to see them?", "a": "Pas encore, mais j'espère que ça sera possible bientôt, une fois que mon emploi du temps sera plus stable."}, {"zh": "Does your family support your studies in Canada?", "a": "Oui, tout à fait, ils m'encouragent beaucoup dans mes études et mon apprentissage du français."}, {"zh": "Do you have brothers or sisters?", "a": "Oui, j’ai une sœur aînée. Elle vit aux États-Unis. Elle a maintenant deux petits neveux adorables. Nous discutons souvent en vidéo, de nos vies et des études des enfants."}]}, {"id": 3, "zh": "Studies", "fr": "Les études", "prio": "Every day", "examples": [{"q": ["Que faites-vous comme études actuellement ?"], "a": "J'étudie l'informatique à l'Université Dalhousie. Je suis actuellement en troisième année, et je devrais terminer mes études en 2028."}, {"q": ["Pourquoi avez-vous choisi ce domaine ?"], "a": "En fait, ce n'est pas mon premier domaine d'études. J'ai d'abord étudié l'économie, puis j'ai fait un master en traduction anglaise. J'ai choisi l'informatique plus tard, parce que je voulais avoir la capacité de créer mes propres applications et produits."}], "opener": "J'étudie l'informatique à l'Université Dalhousie.", "follow": []}, {"id": 4, "zh": "Work and career", "fr": "Le travail", "prio": "Weekly", "examples": [{"q": ["Travaillez-vous actuellement ?"], "a": "Bientôt, je vais travailler à temps partiel dans une entreprise canadienne grâce au programme Volta. Ce sera ma première expérience professionnelle ici au Canada."}, {"q": ["Quels sont vos projets professionnels ?"], "a": "Je voudrais travailler dans le domaine de l'analyse de données ou des systèmes informatiques après mes études, et rester au Canada pour y construire ma carrière."}], "opener": "Je vais bientôt commencer un travail à temps partiel chez Volta.", "follow": [{"zh": "What is Volta?", "a": "C'est un programme qui met en relation des étudiants avec de vraies entreprises canadiennes."}, {"zh": "What exactly will you do?", "a": "Je vais probablement travailler sur des projets liés à l'analyse de données."}, {"zh": "When did it start?", "a": "Ça a commencé début septembre, donc c'est très récent."}, {"zh": "Is this your first job in Canada?", "a": "Oui, exactement, ce sera ma première expérience professionnelle ici."}, {"zh": "Are you nervous / how do you feel?", "a": "Un peu, comment dire, mais surtout j'ai vraiment hâte de commencer."}, {"zh": "What field do you want to work in later?", "a": "Je voudrais travailler dans l'analyse de données ou les systèmes informatiques après mes études."}]}, {"id": 5, "zh": "Daily life", "fr": "La vie quotidienne", "prio": "2–3 times a week", "examples": [{"q": ["Décrivez une journée typique pour vous."], "a": "En général, je vais à mes cours le matin, puis je passe du temps à étudier ou à pratiquer mon français l'après-midi. Le soir, j'aime me détendre en écoutant de la musique."}, {"q": ["Votre routine a-t-elle changé récemment ?"], "a": "Oui, à partir de septembre, mon emploi du temps va beaucoup changer, parce que je dois combiner mes cours, mon travail chez Volta et l'apprentissage du français."}], "opener": "Mon emploi du temps a beaucoup changé depuis septembre.", "follow": [{"zh": "Why did it change?", "a": "Parce que je dois maintenant combiner mes cours, mon travail chez Volta et l'apprentissage du français."}, {"zh": "Then describe a typical day?", "a": "En général, je vais à mes cours le matin, puis je travaille l'après-midi."}, {"zh": "When do you practise French?", "a": "Souvent pendant les trajets en bus, entre deux activités."}, {"zh": "Is it busy / can you cope?", "a": "Oui, c'est assez chargé, mais et bien, j'essaie de bien m'organiser."}, {"zh": "And at the weekend?", "a": "Le week-end, c'est plutôt plus calme, je peux me détendre un peu plus."}]}, {"id": 6, "zh": "Hobbies and free time", "fr": "Les loisirs", "prio": "Weekly, with detail", "examples": [{"q": ["Qu'aimez-vous faire pendant votre temps libre ?"], "a": "J'aime beaucoup la photographie et la musique. Récemment, j'ai aussi commencé à préparer mon propre café à la maison, comme un latte au matcha ou à la noix de coco."}, {"q": ["Avez-vous un sport que vous pratiquez ?"], "a": "Oui, j'ai appris à nager cette année, grâce à mon ami. Maintenant, je sais faire le crawl, la brasse et le dos crawlé, et j'en suis très fier."}], "opener": "J'aime beaucoup la photographie et la musique.", "follow": []}, {"id": 7, "zh": "Where you live", "fr": "Le lieu de vie", "prio": "Once a week", "examples": [{"q": ["Où habitez-vous ? Décrivez votre ville ou votre quartier."], "a": "J'habite à Halifax, en Nouvelle-Écosse. C'est une ville universitaire au bord de l'océan Atlantique. La ville n'est pas très grande, elle est calme mais dynamique, grâce à tous les étudiants. Il y a beaucoup de parcs et de plages, j'aime beaucoup marcher au bord de la mer quand le temps est beau. Je me déplace principalement en bus, car le réseau de transport en commun est bien développé. Comme je suis étudiant, je n'ai pas vraiment besoin de voiture au quotidien."}, {"q": ["Aimez-vous l'endroit où vous vivez ?"], "a": "Oui, j'aime bien Halifax, parce que c'est une ville calme mais quand même assez dynamique grâce aux étudiants."}], "opener": "J'habite à Halifax, en Nouvelle-Écosse.", "follow": [{"zh": "Describe the city?", "a": "C'est une ville universitaire, assez calme, au bord de l'océan Atlantique."}, {"zh": "What kind of home do you live in?", "a": "Je vis dans un appartement, pas très loin de mon université."}, {"zh": "How do you get around?", "a": "Je me déplace principalement en bus, je n'ai pas besoin de voiture."}, {"zh": "Do you like it here?", "a": "Oui, j'aime bien, c'est dynamique grâce aux étudiants, mais pas trop bruyant non plus."}, {"zh": "Do you want to live here for good?", "a": "Pour l'instant oui, mais ça dépendra surtout de mes opportunités professionnelles."}]}, {"id": 8, "zh": "Future plans", "fr": "Les projets d'avenir", "prio": "Weekly", "examples": [{"q": ["Quels sont vos projets pour les prochaines années ?"], "a": "Je voudrais obtenir un niveau B2 en français d'ici la fin de l'année, et continuer à acquérir mon expérience professionnelle au Canada grâce à des programmes comme Volta."}, {"q": ["Voyez-vous votre avenir au Canada ?"], "a": "Oui, je pense rester au Canada pour ma carrière, parce que c'est un environnement qui correspond bien à mes objectifs professionnels et personnels."}], "opener": "J'ai deux objectifs principaux pour les prochaines années.", "follow": [{"zh": "Which two?", "a": "D'abord, obtenir un niveau B2 en français d'ici la fin de l'année."}, {"zh": "And then?", "a": "Ensuite, continuer à construire mon expérience professionnelle au Canada."}, {"zh": "Why is French so important?", "a": "Parce que c'est essentiel pour bien m'intégrer et pour mes projets d'immigration."}, {"zh": "Do you plan to stay in Canada?", "a": "Oui, je pense rester ici pour ma carrière, ça correspond bien à mes objectifs."}, {"zh": "Where do you see yourself in five years?", "a": "Comment dire... probablement toujours au Canada, avec un poste dans l'analyse de données."}]}, {"id": 9, "zh": "Personal belongings", "fr": "Les objets personnels", "prio": "Once a week", "examples": [], "opener": "J'ai un objet auquel je tiens beaucoup.", "follow": [{"zh": "What is it?", "a": "C'est mon appareil photo, je l'utilise très souvent."}, {"zh": "Why is it so important?", "a": "Parce que la photographie est une de mes passions, et il me suit partout."}, {"zh": "When did you start photography?", "a": "Depuis quelques années déjà, mais je m'y suis vraiment mis plus sérieusement récemment."}, {"zh": "Any other important items?", "a": "Oui, et bien, j'ai aussi tout mon matériel pour préparer du café à la maison."}]}], "conj": {"être": {"zh": "to be", "aux": "avoir", "forms": {"présent": ["suis", "es", "est", "sommes", "êtes", "sont"], "passé composé": ["ai été", "as été", "a été", "avons été", "avez été", "ont été"], "imparfait": ["étais", "étais", "était", "étions", "étiez", "étaient"], "plus-que-parfait": ["avais été", "avais été", "avait été", "avions été", "aviez été", "avaient été"], "futur simple": ["serai", "seras", "sera", "serons", "serez", "seront"], "conditionnel présent": ["serais", "serais", "serait", "serions", "seriez", "seraient"], "subjonctif présent": ["sois", "sois", "soit", "soyons", "soyez", "soient"]}}, "avoir": {"zh": "to have", "aux": "avoir", "forms": {"présent": ["ai", "as", "a", "avons", "avez", "ont"], "passé composé": ["ai eu", "as eu", "a eu", "avons eu", "avez eu", "ont eu"], "imparfait": ["avais", "avais", "avait", "avions", "aviez", "avaient"], "plus-que-parfait": ["avais eu", "avais eu", "avait eu", "avions eu", "aviez eu", "avaient eu"], "futur simple": ["aurai", "auras", "aura", "aurons", "aurez", "auront"], "conditionnel présent": ["aurais", "aurais", "aurait", "aurions", "auriez", "auraient"], "subjonctif présent": ["aie", "aies", "ait", "ayons", "ayez", "aient"]}}, "aller": {"zh": "to go", "aux": "être", "forms": {"présent": ["vais", "vas", "va", "allons", "allez", "vont"], "passé composé": ["suis allé", "es allé", "est allé", "sommes allé", "êtes allé", "sont allé"], "imparfait": ["allais", "allais", "allait", "allions", "alliez", "allaient"], "plus-que-parfait": ["étais allé", "étais allé", "était allé", "étions allé", "étiez allé", "étaient allé"], "futur simple": ["irai", "iras", "ira", "irons", "irez", "iront"], "conditionnel présent": ["irais", "irais", "irait", "irions", "iriez", "iraient"], "subjonctif présent": ["aille", "ailles", "aille", "allions", "alliez", "aillent"]}}, "faire": {"zh": "to do, make", "aux": "avoir", "forms": {"présent": ["fais", "fais", "fait", "faisons", "faites", "font"], "passé composé": ["ai fait", "as fait", "a fait", "avons fait", "avez fait", "ont fait"], "imparfait": ["faisais", "faisais", "faisait", "faisions", "faisiez", "faisaient"], "plus-que-parfait": ["avais fait", "avais fait", "avait fait", "avions fait", "aviez fait", "avaient fait"], "futur simple": ["ferai", "feras", "fera", "ferons", "ferez", "feront"], "conditionnel présent": ["ferais", "ferais", "ferait", "ferions", "feriez", "feraient"], "subjonctif présent": ["fasse", "fasses", "fasse", "fassions", "fassiez", "fassent"]}}, "pouvoir": {"zh": "can, to be able", "aux": "avoir", "forms": {"présent": ["peux", "peux", "peut", "pouvons", "pouvez", "peuvent"], "passé composé": ["ai pu", "as pu", "a pu", "avons pu", "avez pu", "ont pu"], "imparfait": ["pouvais", "pouvais", "pouvait", "pouvions", "pouviez", "pouvaient"], "plus-que-parfait": ["avais pu", "avais pu", "avait pu", "avions pu", "aviez pu", "avaient pu"], "futur simple": ["pourrai", "pourras", "pourra", "pourrons", "pourrez", "pourront"], "conditionnel présent": ["pourrais", "pourrais", "pourrait", "pourrions", "pourriez", "pourraient"], "subjonctif présent": ["puisse", "puisses", "puisse", "puissions", "puissiez", "puissent"]}}, "vouloir": {"zh": "to want", "aux": "avoir", "forms": {"présent": ["veux", "veux", "veut", "voulons", "voulez", "veulent"], "passé composé": ["ai voulu", "as voulu", "a voulu", "avons voulu", "avez voulu", "ont voulu"], "imparfait": ["voulais", "voulais", "voulait", "voulions", "vouliez", "voulaient"], "plus-que-parfait": ["avais voulu", "avais voulu", "avait voulu", "avions voulu", "aviez voulu", "avaient voulu"], "futur simple": ["voudrai", "voudras", "voudra", "voudrons", "voudrez", "voudront"], "conditionnel présent": ["voudrais", "voudrais", "voudrait", "voudrions", "voudriez", "voudraient"], "subjonctif présent": ["veuille", "veuilles", "veuille", "voulions", "vouliez", "veuillent"]}}, "devoir": {"zh": "must, to have to", "aux": "avoir", "forms": {"présent": ["dois", "dois", "doit", "devons", "devez", "doivent"], "passé composé": ["ai dû", "as dû", "a dû", "avons dû", "avez dû", "ont dû"], "imparfait": ["devais", "devais", "devait", "devions", "deviez", "devaient"], "plus-que-parfait": ["avais dû", "avais dû", "avait dû", "avions dû", "aviez dû", "avaient dû"], "futur simple": ["devrai", "devras", "devra", "devrons", "devrez", "devront"], "conditionnel présent": ["devrais", "devrais", "devrait", "devrions", "devriez", "devraient"], "subjonctif présent": ["doive", "doives", "doive", "devions", "deviez", "doivent"]}}, "savoir": {"zh": "to know", "aux": "avoir", "forms": {"présent": ["sais", "sais", "sait", "savons", "savez", "savent"], "passé composé": ["ai su", "as su", "a su", "avons su", "avez su", "ont su"], "imparfait": ["savais", "savais", "savait", "savions", "saviez", "savaient"], "plus-que-parfait": ["avais su", "avais su", "avait su", "avions su", "aviez su", "avaient su"], "futur simple": ["saurai", "sauras", "saura", "saurons", "saurez", "sauront"], "conditionnel présent": ["saurais", "saurais", "saurait", "saurions", "sauriez", "sauraient"], "subjonctif présent": ["sache", "saches", "sache", "sachions", "sachiez", "sachent"]}}, "venir": {"zh": "to come", "aux": "être", "forms": {"présent": ["viens", "viens", "vient", "venons", "venez", "viennent"], "passé composé": ["suis venu", "es venu", "est venu", "sommes venu", "êtes venu", "sont venu"], "imparfait": ["venais", "venais", "venait", "venions", "veniez", "venaient"], "plus-que-parfait": ["étais venu", "étais venu", "était venu", "étions venu", "étiez venu", "étaient venu"], "futur simple": ["viendrai", "viendras", "viendra", "viendrons", "viendrez", "viendront"], "conditionnel présent": ["viendrais", "viendrais", "viendrait", "viendrions", "viendriez", "viendraient"], "subjonctif présent": ["vienne", "viennes", "vienne", "venions", "veniez", "viennent"]}}, "prendre": {"zh": "to take", "aux": "avoir", "forms": {"présent": ["prends", "prends", "prend", "prenons", "prenez", "prennent"], "passé composé": ["ai pris", "as pris", "a pris", "avons pris", "avez pris", "ont pris"], "imparfait": ["prenais", "prenais", "prenait", "prenions", "preniez", "prenaient"], "plus-que-parfait": ["avais pris", "avais pris", "avait pris", "avions pris", "aviez pris", "avaient pris"], "futur simple": ["prendrai", "prendras", "prendra", "prendrons", "prendrez", "prendront"], "conditionnel présent": ["prendrais", "prendrais", "prendrait", "prendrions", "prendriez", "prendraient"], "subjonctif présent": ["prenne", "prennes", "prenne", "prenions", "preniez", "prennent"]}}, "dire": {"zh": "to say", "aux": "avoir", "forms": {"présent": ["dis", "dis", "dit", "disons", "dites", "disent"], "passé composé": ["ai dit", "as dit", "a dit", "avons dit", "avez dit", "ont dit"], "imparfait": ["disais", "disais", "disait", "disions", "disiez", "disaient"], "plus-que-parfait": ["avais dit", "avais dit", "avait dit", "avions dit", "aviez dit", "avaient dit"], "futur simple": ["dirai", "diras", "dira", "dirons", "direz", "diront"], "conditionnel présent": ["dirais", "dirais", "dirait", "dirions", "diriez", "diraient"], "subjonctif présent": ["dise", "dises", "dise", "disions", "disiez", "disent"]}}, "voir": {"zh": "to see", "aux": "avoir", "forms": {"présent": ["vois", "vois", "voit", "voyons", "voyez", "voient"], "passé composé": ["ai vu", "as vu", "a vu", "avons vu", "avez vu", "ont vu"], "imparfait": ["voyais", "voyais", "voyait", "voyions", "voyiez", "voyaient"], "plus-que-parfait": ["avais vu", "avais vu", "avait vu", "avions vu", "aviez vu", "avaient vu"], "futur simple": ["verrai", "verras", "verra", "verrons", "verrez", "verront"], "conditionnel présent": ["verrais", "verrais", "verrait", "verrions", "verriez", "verraient"], "subjonctif présent": ["voie", "voies", "voie", "voyions", "voyiez", "voient"]}}, "mettre": {"zh": "to put", "aux": "avoir", "forms": {"présent": ["mets", "mets", "met", "mettons", "mettez", "mettent"], "passé composé": ["ai mis", "as mis", "a mis", "avons mis", "avez mis", "ont mis"], "imparfait": ["mettais", "mettais", "mettait", "mettions", "mettiez", "mettaient"], "plus-que-parfait": ["avais mis", "avais mis", "avait mis", "avions mis", "aviez mis", "avaient mis"], "futur simple": ["mettrai", "mettras", "mettra", "mettrons", "mettrez", "mettront"], "conditionnel présent": ["mettrais", "mettrais", "mettrait", "mettrions", "mettriez", "mettraient"], "subjonctif présent": ["mette", "mettes", "mette", "mettions", "mettiez", "mettent"]}}, "écrire": {"zh": "to write", "aux": "avoir", "forms": {"présent": ["écris", "écris", "écrit", "écrivons", "écrivez", "écrivent"], "passé composé": ["ai écrit", "as écrit", "a écrit", "avons écrit", "avez écrit", "ont écrit"], "imparfait": ["écrivais", "écrivais", "écrivait", "écrivions", "écriviez", "écrivaient"], "plus-que-parfait": ["avais écrit", "avais écrit", "avait écrit", "avions écrit", "aviez écrit", "avaient écrit"], "futur simple": ["écrirai", "écriras", "écrira", "écrirons", "écrirez", "écriront"], "conditionnel présent": ["écrirais", "écrirais", "écrirait", "écririons", "écririez", "écriraient"], "subjonctif présent": ["écrive", "écrives", "écrive", "écrivions", "écriviez", "écrivent"]}}, "partir": {"zh": "to leave", "aux": "être", "forms": {"présent": ["pars", "pars", "part", "partons", "partez", "partent"], "passé composé": ["suis parti", "es parti", "est parti", "sommes parti", "êtes parti", "sont parti"], "imparfait": ["partais", "partais", "partait", "partions", "partiez", "partaient"], "plus-que-parfait": ["étais parti", "étais parti", "était parti", "étions parti", "étiez parti", "étaient parti"], "futur simple": ["partirai", "partiras", "partira", "partirons", "partirez", "partiront"], "conditionnel présent": ["partirais", "partirais", "partirait", "partirions", "partiriez", "partiraient"], "subjonctif présent": ["parte", "partes", "parte", "partions", "partiez", "partent"]}}, "parler": {"zh": "to speak", "aux": "avoir", "forms": {"présent": ["parle", "parles", "parle", "parlons", "parlez", "parlent"], "passé composé": ["ai parlé", "as parlé", "a parlé", "avons parlé", "avez parlé", "ont parlé"], "imparfait": ["parlais", "parlais", "parlait", "parlions", "parliez", "parlaient"], "plus-que-parfait": ["avais parlé", "avais parlé", "avait parlé", "avions parlé", "aviez parlé", "avaient parlé"], "futur simple": ["parlerai", "parleras", "parlera", "parlerons", "parlerez", "parleront"], "conditionnel présent": ["parlerais", "parlerais", "parlerait", "parlerions", "parleriez", "parleraient"], "subjonctif présent": ["parle", "parles", "parle", "parlions", "parliez", "parlent"]}}, "finir": {"zh": "to finish", "aux": "avoir", "forms": {"présent": ["finis", "finis", "finit", "finissons", "finissez", "finissent"], "passé composé": ["ai fini", "as fini", "a fini", "avons fini", "avez fini", "ont fini"], "imparfait": ["finissais", "finissais", "finissait", "finissions", "finissiez", "finissaient"], "plus-que-parfait": ["avais fini", "avais fini", "avait fini", "avions fini", "aviez fini", "avaient fini"], "futur simple": ["finirai", "finiras", "finira", "finirons", "finirez", "finiront"], "conditionnel présent": ["finirais", "finirais", "finirait", "finirions", "finiriez", "finiraient"], "subjonctif présent": ["finisse", "finisses", "finisse", "finissions", "finissiez", "finissent"]}}, "attendre": {"zh": "to wait", "aux": "avoir", "forms": {"présent": ["attends", "attends", "attend", "attendons", "attendez", "attendent"], "passé composé": ["ai attendu", "as attendu", "a attendu", "avons attendu", "avez attendu", "ont attendu"], "imparfait": ["attendais", "attendais", "attendait", "attendions", "attendiez", "attendaient"], "plus-que-parfait": ["avais attendu", "avais attendu", "avait attendu", "avions attendu", "aviez attendu", "avaient attendu"], "futur simple": ["attendrai", "attendras", "attendra", "attendrons", "attendrez", "attendront"], "conditionnel présent": ["attendrais", "attendrais", "attendrait", "attendrions", "attendriez", "attendraient"], "subjonctif présent": ["attende", "attendes", "attende", "attendions", "attendiez", "attendent"]}}}, "pron": ["je", "tu", "il/elle", "nous", "vous", "ils/elles"]};
+</script>
+<script>
+(function(){
+'use strict';
+/* ---------- helpers ---------- */
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const norm = (s, loose) => { s = String(s).toLowerCase().replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim(); return loose ? s.normalize('NFD').replace(/[̀-ͯ]/g, '') : s; };
+const wordCount = s => (String(s).trim().match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).length;
+const ymd = (d) => { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const fmt = s => { s = Math.max(0, Math.round(s)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+const ord = n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({1:'st',2:'nd',3:'rd'}[n % 10] || 'th'));
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 2200); }
+
+/* ---------- state + storage ---------- */
+const KEY = 'cahier-tcf-v1';
+const blank = () => ({v:1, upd:0, days:{}, writing:{}, oral:{cards:{}}, drill:{wrong:{}, stats:{}}, errors:[]});
+let S = blank();
+let dbDoc = null, saveTimer = null;
+function merge(o){ const b = blank(); return Object.assign(b, o, {oral:Object.assign(b.oral, (o||{}).oral), drill:Object.assign(b.drill, (o||{}).drill)}); }
+function save(){
+  S.upd = Date.now();
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => { if(dbDoc){ dbDoc.set({json:JSON.stringify(S), upd:S.upd}).catch(() => {}); } }, 900);
+}
+function bump(kind, n){ const d = ymd(); (S.days[d] = S.days[d] || {w:0,o:0,d:0}); S.days[d][kind] = (S.days[d][kind] || 0) + (n || 1); save(); }
+async function initStore(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) S = merge(JSON.parse(raw)); }catch(e){}
+  try{
+    if(window.claude && window.claude.use){
+      const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      if(db && user){
+        const id = await user.id();
+        if(id){
+          dbDoc = db.doc('data/users/' + id + '/progress');
+          const snap = await dbDoc.get();
+          if(snap.exists){ const r = snap.data(); if(r && r.json && (r.upd || 0) > (S.upd || 0)){ S = merge(JSON.parse(r.json)); try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} render(); } }
+          else if(S.upd){ save(); }
+        }
+      }
+    }
+  }catch(e){}
+}
+
+/* ---------- AI (sample capability) ---------- */
+let sampleFn;
+async function getSample(){
+  if(sampleFn !== undefined) return sampleFn;
+  try{ sampleFn = (window.claude && window.claude.use) ? await window.claude.use('sample') : null; }catch(e){ sampleFn = null; }
+  return sampleFn;
+}
+async function askJSON(prompt){
+  const s = await getSample();
+  if(!s) throw {code:'unavailable'};
+  return await s.json(prompt, {cache:false});
+}
+function aiErr(e){
+  const c = e && e.code;
+  if(c === 'unavailable' || c === 'not_granted') return 'This needs the page to be opened inside Claude, with permission allowed in the pop-up.';
+  if(c === 'rate_limited') return 'Too many requests. Wait a moment and try again.';
+  return 'The feedback did not go through. Please try again.' + (e && e.message ? ' (' + esc(e.message) + ')' : '');
+}
+
+/* ---------- speech (reading aloud only) ---------- */
+function speak(text){
+  try{
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'fr-FR'; u.rate = .92;
+    const v = speechSynthesis.getVoices().find(v => /^fr/i.test(v.lang)); if(v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){ toast('This device cannot read French aloud'); }
+}
+const canSpeak = (() => { try{ return 'speechSynthesis' in window; }catch(e){ return false; } })();
+
+/* ---------- constants ---------- */
+const TASK = {
+  1:{name:'T1 Message', min:60, max:120, secs:600, hint:'Suggested time: 10 minutes'},
+  2:{name:'T2 Narrative', min:120, max:150, secs:1200, hint:'Suggested time: 20 minutes'},
+  3:{name:'T3 Opinion', min:120, max:180, secs:1800, hint:'Suggested time: 30 minutes'}
+};
+const LEVELS = [
+  {n:1, name:'Gaps', d:'Connectors and verbs are blanked out of a model text. Fill them in.'},
+  {n:2, name:'Frames', d:'Each sentence starts for you. Finish it your own way.'},
+  {n:3, name:'Rewrite', d:'Memorize the model, cover it, write it from memory, then rewrite it with your own details.'},
+  {n:4, name:'Points', d:'Only a few key points are given. Write the whole text in French.'},
+  {n:5, name:'Timed', d:'Only the prompt. Write against the clock, like the exam.'}
+];
+const END = new Date(2026, 11, 31, 23, 59, 59);
+const ITEMS = DATA.writing;
+const byId = id => ITEMS.find(x => x.id === id);
+
+/* ---------- navigation ---------- */
+const TABS = [['today','Today'],['write','Writing'],['oral','Speaking'],['tense','Tenses'],['prog','Progress']];
+let tab = 'today';
+let V = {};
+let timer = null;
+function stopTimer(){ if(timer){ clearInterval(timer.h); timer = null; } }
+function startTimer(el, secs, opts){
+  stopTimer(); opts = opts || {};
+  const t0 = Date.now(); let ended = false;
+  const tick = () => {
+    const left = opts.up ? (Date.now() - t0) / 1000 : secs - (Date.now() - t0) / 1000;
+    el.textContent = fmt(left); el.classList.toggle('low', !opts.up && left <= 60);
+    if(!opts.up && left <= 0 && !ended){ ended = true; stopTimer(); if(opts.onEnd) opts.onEnd(); }
+  };
+  tick(); timer = {h:setInterval(tick, 250)};
+}
+function go(t, v){ stopTimer(); tab = t; V = v || {}; render(); window.scrollTo(0, 0); }
+function renderTabs(){
+  $('#tabs').innerHTML = TABS.map(([k, n]) => `<button role="tab" data-act="tab" data-k="${k}" aria-selected="${tab === k}">${n}</button>`).join('');
+}
+function render(){
+  renderTabs();
+  ({today:rToday, write:rWrite, oral:rOral, tense:rTense, prog:rProg}[tab])($('#main'));
+}
+const daysLeft = () => Math.max(0, Math.ceil((END - new Date()) / 86400000));
+function countdown(){ $('#countdown').textContent = daysLeft() + ' days to Dec 31'; }
+
+/* ---------- Today ---------- */
+function phase(){
+  const m = new Date().getMonth() + 1;
+  if(m < 11) return {n:'October · Build the base', t:'Get your hands back on the keyboard. Learn the structures and connectors, do a little T1 speaking daily, and stay on the supported writing levels (1 to 3).'};
+  if(m === 11) return {n:'November · Speed up', t:'Start the clock: T1 in 10 minutes, T3 in 30. Move writing to levels 4 and 5 and start T3 speaking.'};
+  return {n:'December · Exam mode', t:'One or two full mock sessions a week, fixing only your weakest part. The last week is for reviewing mistakes, not new material.'};
+}
+function nextWriting(){
+  let best = null, bs = 99;
+  ITEMS.forEach((it, i) => {
+    const w = S.writing[it.id] || {done:{}};
+    let lv = 1; while(w.done && w.done[lv] && lv <= 5) lv++;
+    if(lv > 5) return;
+    const score = lv * 10 + (w.tries ? 1 : 0) + (it.task === 2 ? .2 : 0) + i / 1000;
+    if(score < bs){ bs = score; best = {it, lv}; }
+  });
+  return best;
+}
+function weakDrill(){
+  const k = Object.entries(S.drill.wrong).filter(([,n]) => n > 0).sort((a, b) => b[1] - a[1])[0];
+  return k ? k[0].split('|') : ['aller', 'passé composé'];
+}
+function rToday(m){
+  const d = S.days[ymd()] || {w:0,o:0,d:0};
+  let streak = 0; for(let i = 0; i < 400; i++){ const dd = new Date(); dd.setDate(dd.getDate() - i); const x = S.days[ymd(dd)]; if(x && (x.w + x.o + x.d) > 0) streak++; else if(i > 0) break; }
+  let week = 0; for(let i = 0; i < 7; i++){ const dd = new Date(); dd.setDate(dd.getDate() - i); const x = S.days[ymd(dd)]; if(x && (x.w + x.o + x.d) > 0) week++; }
+  const nw = nextWriting(), wd = weakDrill(), ph = phase(), now = new Date();
+  const doneAll = d.o >= 3 && d.w >= 1 && d.d >= 1;
+  m.innerHTML = `
+  <section class="hero">
+    <div class="hero-date">
+      <b>${now.toLocaleDateString('en-US', {weekday:'short'})}</b><b class="dim">${ord(now.getDate())}</b>
+      <div class="orb"></div>
+      <div class="meta">${now.toLocaleDateString('en-US', {month:'long', year:'numeric'})}<br>${daysLeft()} days to Dec 31</div>
+    </div>
+    <div class="hero-right"><div class="sun"></div>
+      <p class="small muted">${esc(ph.n)}</p>
+      <p style="font-size:.95rem">${esc(ph.t)}</p>
+      <button class="btn primary go" data-act="goto" data-k="oral">${doneAll ? 'Practice more' : 'Start today'}</button>
+    </div>
+  </section>
+  ${nw ? `<section class="card dark"><p class="small muted">Next writing exercise</p>
+    <h2 style="font-weight:300;color:var(--dark-fg)">${esc(nw.it.title)}</h2>
+    <div class="row between"><span class="small muted">${TASK[nw.it.task].name} · Level ${nw.lv}, ${LEVELS[nw.lv - 1].name}</span>
+    <button class="btn primary go" data-act="openw" data-id="${nw.it.id}" data-lv="${nw.lv}">Open</button></div></section>` : ''}
+  <section class="card">
+    <h3>Today's practice</h3>
+    <div class="stack" style="gap:16px">
+      <div class="check ${d.o >= 3 ? 'done' : ''}"><div class="box">${d.o >= 3 ? '✓' : ''}</div>
+        <div class="stack" style="gap:2px"><span class="t"><b style="font-weight:500">Speaking T1: answer 3 questions</b> <span class="muted small">${d.o}/3</span></span>
+        <span class="small muted">Say the opening line, then draw follow-ups. Check yourself against the model answer.</span>
+        <div><button class="btn sm" data-act="goto" data-k="oral">Practice speaking</button></div></div></div>
+      <div class="check ${d.w >= 1 ? 'done' : ''}"><div class="box">${d.w >= 1 ? '✓' : ''}</div>
+        <div class="stack" style="gap:2px"><span class="t"><b style="font-weight:500">Writing: complete 1 exercise</b> <span class="muted small">${d.w}/1</span></span>
+        <span class="small muted">${nw ? 'Suggested: “' + esc(nw.it.title) + '”, level ' + nw.lv : 'Every level of every prompt is done.'}</span>
+        ${nw ? `<div><button class="btn sm" data-act="openw" data-id="${nw.it.id}" data-lv="${nw.lv}">Start</button></div>` : ''}</div></div>
+      <div class="check ${d.d >= 1 ? 'done' : ''}"><div class="box">${d.d >= 1 ? '✓' : ''}</div>
+        <div class="stack" style="gap:2px"><span class="t"><b style="font-weight:500">Tenses: fill in 1 conjugation table</b> <span class="muted small">${d.d}/1</span></span>
+        <span class="small muted">Suggested: ${esc(wd[0])} · ${esc(wd[1])} (${S.drill.wrong[wd.join('|')] ? 'you missed this one' : 'a good place to start'})</span>
+        <div><button class="btn sm" data-act="drill" data-v="${esc(wd[0])}" data-t="${esc(wd[1])}">Start</button></div></div></div>
+    </div>
+  </section>
+  <section class="grid">
+    <div class="card stat"><span class="muted small">Day streak</span><b>${streak}</b></div>
+    <div class="card stat"><span class="muted small">Practice days, last 7</span><b>${week}<span class="muted" style="font-size:1.1rem"> / 7</span></b><div class="bar"><i style="width:${Math.min(100, week / 5 * 100)}%"></i></div><span class="small muted">Goal: 5 days</span></div>
+  </section>
+  <section class="card flat small muted">30 to 40 minutes a day is enough. On a busy day, 15 minutes of speaking counts. Just don't break the chain. Score estimates from Claude are a rough guide only, so check the official CLB conversion table.</section>`;
+}
+
+/* ---------- Writing: list ---------- */
+function wProgress(id){ const w = S.writing[id]; return w && w.done ? [1,2,3,4,5].filter(l => w.done[l]).length : 0; }
+function rWrite(m){
+  if(V.id) return rWorkspace(m);
+  const f = V.f || 0;
+  const list = ITEMS.filter(x => !f || x.task === f);
+  m.innerHTML = `
+  <section class="card">
+    <h2>Writing <span class="dim">practice</span></h2>
+    <p class="muted small">Every prompt has five levels, from supported to fully blank and timed. Finish one level before moving to the next.</p>
+    <div class="row">${[[0,'All'],[1,'T1'],[2,'T2'],[3,'T3']].map(([k,n]) => `<button class="chip" data-act="wfilter" data-k="${k}" aria-pressed="${f === k}">${n}</button>`).join('')}</div>
+    <div class="row small muted">${LEVELS.map(l => `<span>${l.n} ${l.name}</span>`).join(' · ')}</div>
+  </section>
+  <section class="grid">${list.map(it => `
+    <button class="card" data-act="openw" data-id="${it.id}">
+      <div class="row between"><span class="tag">${TASK[it.task].name.split(' ')[0]}</span><span class="small muted num">${wProgress(it.id)}/5</span></div>
+      <h3>${esc(it.title)}</h3>
+      <div class="pips">${[1,2,3,4,5].map(l => `<i class="${(S.writing[it.id] && S.writing[it.id].done && S.writing[it.id].done[l]) ? 'on' : ''}"></i>`).join('')}</div>
+    </button>`).join('')}</section>`;
+}
+
+/* ---------- Writing: workspace ---------- */
+const CONN = ["tout d'abord","en conclusion","dans l'ensemble","il est essentiel de rappeler que","il est essentiel de reconnaître que","il est crucial de rappeler que","il convient de reconnaître que","dans ce débat","d'un côté","d'un autre côté","non seulement","en revanche","tandis que","alors que","par ailleurs","par conséquent","en outre","en effet","de plus","en somme","en résumé","afin de","afin que","parce que","grâce à","c'est pourquoi","en plus de","ensuite","enfin","cependant","pourtant","toutefois","également","notamment","d'abord","ainsi","donc","mais aussi","car","puis","aussi"];
+const CONN_SORTED = CONN.slice().sort((a, b) => b.length - a.length);
+const AUXW = new Set(['ai','as','a','avons','avez','ont','suis','es','est','sommes','êtes','sont','avais','avait','avaient','étais','était','étaient']);
+const PPRE = /(é|és|ée|ées|i|is|u|us|it|ert|ris|mis)$/;
+function clozeFrom(text){
+  const toks = text.match(/[\p{L}][\p{L}'’-]*|[^\p{L}]+/gu) || [];
+  const words = []; toks.forEach((t, i) => { if(/^\p{L}/u.test(t)) words.push(i); });
+  const cands = [], taken = new Set();
+  for(let wi = 0; wi < words.length; wi++){
+    const i = words[wi]; if(taken.has(i)) continue;
+    let hit = null;
+    for(const c of CONN_SORTED){
+      const n = c.split(/\s+/).length; let s = '', last = i, ok = true;
+      for(let k = 0; k < n; k++){
+        const idx = words[wi + k]; if(idx == null){ ok = false; break; }
+        s += (k ? ' ' : '') + toks[idx].replace(/’/g, "'"); last = idx;
+        if(k < n - 1 && toks.slice(idx + 1, words[wi + k + 1]).join('').trim() !== ''){ ok = false; break; }
+      }
+      if(ok && s.toLowerCase() === c){ hit = {from:i, to:last, ans:toks.slice(i, last + 1).join('')}; break; }
+    }
+    if(hit){ cands.push(hit); for(let j = hit.from; j <= hit.to; j++) taken.add(j); wi += hit.ans.split(/\s+/).length - 1; continue; }
+    const w = toks[i].toLowerCase().replace(/^.*['’]/, '');
+    if(AUXW.has(w) && words[wi + 1] != null){
+      const nx = words[wi + 1], nt = toks[nx];
+      if(PPRE.test(nt) && nt.length >= 3 && toks.slice(i + 1, nx).join('').trim() === ''){ cands.push({from:nx, to:nx, ans:nt}); taken.add(nx); }
+    }
+  }
+  const target = 9;
+  if(cands.length < target){
+    for(let wi = 1; wi < words.length && cands.length < target; wi++){
+      const i = words[wi]; if(taken.has(i)) continue;
+      const prev = toks[words[wi - 1]].toLowerCase().replace(/^.*['’]/, '');
+      if(/(er|ir|re)$/.test(toks[i]) && toks[i].length >= 5 && ['de','d','à','pour','afin','pouvoir','vouloir','aller','peut','pouvez','pourrez','pourrais'].includes(prev)){ cands.push({from:i, to:i, ans:toks[i]}); taken.add(i); }
+    }
+  }
+  if(cands.length < target){
+    const longs = words.filter(i => !taken.has(i) && toks[i].length >= 8);
+    const need = target - cands.length, step = Math.max(1, Math.floor(longs.length / need));
+    for(let k = 0; k < longs.length && cands.length < target; k += step){ cands.push({from:longs[k], to:longs[k], ans:toks[longs[k]]}); taken.add(longs[k]); }
+  }
+  cands.sort((a, b) => a.from - b.from);
+  const MAX = 14; let chosen = cands;
+  if(cands.length > MAX){ const step = cands.length / MAX; chosen = Array.from({length:MAX}, (_, k) => cands[Math.floor(k * step)]); }
+  const mask = new Map(); chosen.forEach(c => mask.set(c.from, c));
+  const out = []; let i = 0;
+  while(i < toks.length){ const c = mask.get(i); if(c){ out.push({b:c.ans}); i = c.to + 1; } else { out.push({t:toks[i]}); i++; } }
+  return out;
+}
+function sentences(item){
+  const paras = item.model.split(/\n\n/);
+  const out = [];
+  paras.forEach((p, pi) => {
+    if(item.task < 3 && (pi === 0 || pi === paras.length - 1) && p.length < 45) return;
+    p.split('\n').join(' ').split(/(?<=[.!?])\s+(?=[A-ZÀ-ÖÉÈÊ«"])/).forEach(s => { if(wordCount(s) >= 4) out.push(s.trim()); });
+  });
+  return out;
+}
+function rWorkspace(m){
+  const it = byId(V.id), t = TASK[it.task], lv = V.lv || 1;
+  const w = S.writing[it.id] = S.writing[it.id] || {done:{}, tries:[]};
+  m.innerHTML = `
+  <section class="card">
+    <div class="row between"><button class="btn sm" data-act="wback">← All prompts</button><span class="tag">${t.name} · ${t.min}–${t.max} words</span></div>
+    <h2>${esc(it.title)}</h2>
+    <p class="fr" style="font-size:1rem">${esc(it.prompt)}</p>
+    <div class="lv" role="tablist">${LEVELS.map(l => `<button role="tab" class="${w.done[l.n] ? 'done' : ''}" data-act="wlv" data-lv="${l.n}" aria-selected="${lv === l.n}">${l.n} ${l.name}${w.done[l.n] ? ' ✓' : ''}</button>`).join('')}</div>
+    <p class="muted small">${LEVELS[lv - 1].d}</p>
+  </section>
+  <div id="lvbody" class="stack"></div>`;
+  const body = $('#lvbody'); stopTimer();
+  [null, wL1, wL2, wL3, wL4, wL5][lv](body, it, w);
+}
+function markDone(it, w, lv, extra){
+  w.done[lv] = true; w.tries.push(Object.assign({lv, ts:Date.now()}, extra || {})); if(w.tries.length > 40) w.tries.shift();
+  bump('w'); save(); toast('Level ' + lv + ' complete');
+  const b = $$('.lv button')[lv - 1]; if(b){ b.classList.add('done'); if(!b.textContent.includes('✓')) b.textContent += ' ✓'; }
+}
+const modelHTML = it => `<div class="model fr">${it.model.split(/\n\n/).map(p => `<p>${esc(p)}</p>`).join('')}</div>`;
+const pointsHTML = it => `<div class="card flat"><h4>Key points</h4><ul class="tight">${it.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>`;
+
+function wL1(b, it, w){
+  const segs = clozeFrom(it.model); let n = 0;
+  const html = segs.map(s => {
+    if(s.t != null) return esc(s.t).replace(/\n\n/g, '</p><p class="fr cloze">').replace(/\n/g, '<br>');
+    n++; const L = Math.max(3, s.b.length);
+    return `<input class="blank" data-ans="${esc(s.b)}" style="width:${L + 1.5}ch" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Gap ${n}">`;
+  }).join('');
+  b.innerHTML = `<section class="card">
+    <div class="row between"><h3>Fill in the model <span class="muted small">(${n} gaps: connectors and verbs)</span></h3>
+      <label class="small row" style="gap:6px"><input type="checkbox" id="loose"> Ignore accents</label></div>
+    <div class="fr cloze"><p class="fr cloze">${html}</p></div>
+    <div class="row"><button class="btn primary" data-act="c1check">Check</button><button class="btn" data-act="c1show">Show answers</button><span id="c1res" class="muted small"></span></div>
+  </section>`;
+  b._it = it; b._w = w;
+}
+function wL2(b, it, w){
+  const ss = sentences(it);
+  b.innerHTML = `${pointsHTML(it)}<section class="card"><h3>Finish each sentence</h3><p class="muted small">Each sentence starts for you. Write your own ending, then tap “Compare” to see the model. The content can differ; the structure is what matters.</p>
+  <div class="stack" id="sents">${ss.map((s, i) => { const ws = s.split(/\s+/); const op = ws.slice(0, 3).join(' '); return `<div class="sent" data-i="${i}"><span class="op">${esc(op)}</span><input class="in" autocomplete="off" spellcheck="false" aria-label="Sentence ${i + 1}"><div class="cmp" hidden>${esc(s)}</div></div>`; }).join('')}</div>
+  <div class="row"><button class="btn" data-act="s2cmp">Compare with model</button><button class="btn primary" data-act="s2done">I'm done</button><button class="btn" data-act="aifb" data-lv="2">Get Claude's feedback</button></div><div id="fb"></div></section>`;
+  b._it = it; b._w = w; b._ss = ss;
+}
+function wL3(b, it, w){
+  b.innerHTML = `<section class="card"><h3>Step 1: memorize the model</h3>
+    <p class="muted small">Read for 90 seconds and notice the structure and connectors. The text hides when time is up.</p>
+    <div class="row"><span class="timer" id="tm">01:30</span><button class="btn" data-act="m3start">Start</button></div>
+    <div id="m3model" hidden>${modelHTML(it)}</div></section>
+  <section class="card"><h3>Step 2: write it from memory</h3><textarea id="t3a" placeholder="The model is hidden. Write what you remember…" aria-label="From memory"></textarea>
+    <div class="row"><span class="wc" id="wc3a"></span><button class="btn" data-act="m3peek">Compare with model</button></div><div id="m3cmp" hidden></div></section>
+  <section class="card"><h3>Step 3: rewrite with your own details</h3><p class="muted small">Keep the structure. Swap the times, places, people and details for your own.</p>
+    <textarea id="t3b" aria-label="Rewrite"></textarea>
+    <div class="row"><span class="wc" id="wc3b"></span><button class="btn primary" data-act="aifb" data-lv="3">Get Claude's feedback</button><button class="btn" data-act="done3">Mark complete</button></div><div id="fb"></div></section>`;
+  b._it = it; b._w = w;
+  ['t3a','t3b'].forEach(id => { const ta = $('#' + id, b), c = $('#wc' + id.slice(1), b); const f = () => { c.textContent = wordCount(ta.value) + ' words'; }; ta.addEventListener('input', f); f(); });
+}
+function wcClass(it, n){ const t = TASK[it.task]; return n >= t.min && n <= t.max ? 'ok' : 'warn'; }
+function wL4(b, it, w){
+  const t = TASK[it.task];
+  b.innerHTML = `${pointsHTML(it)}<section class="card"><h3>Write the whole text in French</h3>
+    <textarea id="t4" aria-label="Your text" placeholder="${it.task < 3 ? 'Salut …,' : ''}"></textarea>
+    <div class="row between"><span class="wc" id="wc4"></span><span class="muted small">Target ${t.min}–${t.max} words</span></div>
+    <div class="row"><button class="btn primary" data-act="aifb" data-lv="4">Get Claude's feedback</button><button class="btn" data-act="peek4">Show model</button><button class="btn" data-act="done4">Mark complete</button></div>
+    <div id="m4" hidden>${modelHTML(it)}</div><div id="fb"></div></section>`;
+  b._it = it; b._w = w;
+  const ta = $('#t4', b), c = $('#wc4', b); const f = () => { const n = wordCount(ta.value); c.textContent = n + ' words'; c.className = 'wc ' + (n ? wcClass(it, n) : ''); }; ta.addEventListener('input', f); f();
+}
+function wL5(b, it, w){
+  const t = TASK[it.task];
+  b.innerHTML = `<section class="card"><div class="row between"><div><h3>Timed writing</h3><p class="muted small">${t.hint}, ${t.min}–${t.max} words. No model, no dictionary.</p></div><span class="timer" id="tm">${fmt(t.secs)}</span></div>
+    <div class="row"><button class="btn primary go" data-act="t5start">Start the clock</button></div>
+    <textarea id="t5" aria-label="Your text" disabled></textarea>
+    <div class="row between"><span class="wc" id="wc5"></span><span class="muted small" id="used"></span></div>
+    <div class="row"><button class="btn primary" data-act="aifb" data-lv="5">Submit and get feedback</button></div><div id="fb"></div></section>`;
+  b._it = it; b._w = w;
+  const ta = $('#t5', b), c = $('#wc5', b); const f = () => { const n = wordCount(ta.value); c.textContent = n + ' words'; c.className = 'wc ' + (n ? wcClass(it, n) : ''); }; ta.addEventListener('input', f); f();
+}
+function wText(b, lv){
+  if(lv === 2) return $$('.sent', b).map(r => ($('.op', r).textContent + ' ' + $('input', r).value).trim()).join(' ');
+  if(lv === 3) return $('#t3b', b).value.trim() || $('#t3a', b).value.trim();
+  if(lv === 4) return $('#t4', b).value.trim();
+  return $('#t5', b).value.trim();
+}
+const RUBRIC = `TCF Canada written expression criteria: task fulfilment and coverage of the required points, coherence and structure (connectors), range and accuracy of vocabulary, grammatical accuracy (verb tenses, agreement, prepositions), spelling, suitable register (tu/vous, opening and closing formulas).`;
+function fbPrompt(it, text, lv){
+  const t = TASK[it.task];
+  return `You are a TCF Canada examiner for written expression. The student aims for CLB 7. Their current level is around B1 and they are restarting writing after a break, so be demanding but encouraging. All explanations must be in English; corrections and rewrites are in French.
+${RUBRIC}
+Task: ${t.name}, expected length ${t.min}-${t.max} words.
+Prompt (French): ${it.prompt}
+Points expected: ${it.points.join(' ; ')}
+${lv === 2 ? 'Note: the text is a series of sentences whose openings were imposed; judge mostly the accuracy of the sentences.' : ''}
+Student text:
+"""
+${text}
+"""
+Reply ONLY with a JSON object of this shape:
+{"words":number of words,"level":"estimated level, for example CLB 5-6 (rough estimate)","summary":"overall assessment in 1 or 2 sentences, in English","strengths":["strong points, in English"],"errors":[{"orig":"faulty excerpt exactly as written","fix":"correction in French","type":"Tense|Agreement|Article|Preposition|Spelling|Vocabulary|Syntax|Connector|Other","why":"short explanation in English"}],"improved":"corrected version of the full text in French, keeping the student's ideas","phrases":["3 to 5 reusable French expressions — English translation"],"task_ok":true or false,"task_note":"which points of the prompt are covered or missing, in English","focus":"the single most important thing to work on next, in English"}
+List at most 10 errors, most important first.`;
+}
+function fbHTML(r){
+  const errs = (r.errors || []);
+  return `<div class="stack">
+    <div class="row"><span class="tag acc">${esc(r.level || '')}</span><span class="tag">${esc(r.words || '')} words</span><span class="tag ${r.task_ok ? 'ok' : 'warn'}">${r.task_ok ? 'Points covered' : 'Points missing'}</span></div>
+    <p>${esc(r.summary || '')}</p>
+    ${r.task_note ? `<p class="small muted">${esc(r.task_note)}</p>` : ''}
+    ${(r.strengths || []).length ? `<div><h4>What worked</h4><ul class="tight">${r.strengths.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    ${errs.length ? `<div><h4>To fix (saved to your mistakes notebook)</h4><div class="stack">${errs.map(e => `<div class="err"><span class="o">${esc(e.orig)}</span><span class="f">→ ${esc(e.fix)}</span><span class="small muted"><b>${esc(e.type)}</b> ${esc(e.why)}</span></div>`).join('')}</div></div>` : '<p>No clear errors found.</p>'}
+    ${r.improved ? `<details><summary>See the corrected version</summary><div class="model fr" style="margin-top:8px"><p>${esc(r.improved)}</p></div></details>` : ''}
+    ${(r.phrases || []).length ? `<div><h4>Expressions worth keeping</h4><ul class="tight">${r.phrases.map(x => `<li class="fr" style="font-size:.98rem">${esc(x)}</li>`).join('')}</ul></div>` : ''}
+    ${r.focus ? `<div class="card flat"><b style="font-weight:600">Next focus:</b> ${esc(r.focus)}</div>` : ''}
+  </div>`;
+}
+async function runFeedback(b, lv){
+  const it = b._it, w = b._w, box = $('#fb', b);
+  if(lv === 5 && timer){ stopTimer(); }
+  const text = wText(b, lv);
+  if(wordCount(text) < 12){ box.innerHTML = '<p class="muted">Write a little more first (at least a sentence or two).</p>'; return; }
+  box.innerHTML = '<p class="muted">Claude is reading your text…</p>';
+  try{
+    const r = await askJSON(fbPrompt(it, text, lv));
+    box.innerHTML = fbHTML(r);
+    (r.errors || []).forEach(e => { S.errors.unshift({ts:Date.now(), id:it.id, lv, orig:e.orig, fix:e.fix, type:e.type, why:e.why}); });
+    S.errors = S.errors.slice(0, 300);
+    markDone(it, w, lv, {words:wordCount(text), text:text.slice(0, 2000), level:r.level});
+  }catch(e){ box.innerHTML = `<p style="color:var(--bad)">${aiErr(e)}</p>`; }
+}
+
+/* ---------- Oral T1 ---------- */
+function oralCards(){
+  const out = [];
+  DATA.oral.forEach(c => {
+    if(c.opener) out.push({key:'o' + c.id + 'op', cat:c, kind:'Opening line', cue:'Topic: ' + c.zh + '. Say your opening line.', ans:c.opener, fr:false});
+    c.examples.forEach((e, i) => out.push({key:'o' + c.id + 'e' + i, cat:c, kind:'Question', cue:e.q.join(' / '), ans:e.a, fr:true}));
+    c.follow.forEach((f, i) => out.push({key:'o' + c.id + 'f' + i, cat:c, kind:'Follow-up', cue:'The examiner asks: ' + f.zh, ans:f.a, fr:false}));
+  });
+  return out;
+}
+function weight(card){ const r = S.oral.cards[card.key]; if(!r) return 3; return [4, 2, .5][r.last] || 1; }
+function drawCard(pool, avoid){
+  const ws = pool.map(c => c.key === avoid ? 0 : weight(c)); let t = ws.reduce((a, b) => a + b, 0), x = Math.random() * t;
+  for(let i = 0; i < pool.length; i++){ x -= ws[i]; if(x <= 0) return pool[i]; } return pool[0];
+}
+function rOral(m){
+  const all = oralCards();
+  if(V.run) return oralRun(m, all);
+  const sel = V.sel || new Set(DATA.oral.map(c => c.id));
+  V.sel = sel;
+  const cnt = c => all.filter(x => x.cat.id === c.id).length;
+  const seen = all.filter(c => S.oral.cards[c.key]).length;
+  m.innerHTML = `
+  <section class="card"><h2>Speaking <span class="dim">Task 1</span></h2>
+    <p class="muted small">T1 is a two-minute interview. The examiner asks directly, with no preparation time. What counts is a quick, natural answer. Say your opening line first, then be ready for follow-ups. You have ${all.length} cards from your own notes and have practised ${seen}.</p>
+    <div class="row"><button class="btn primary go" data-act="ostart" data-mode="free">Start practice</button><button class="btn" data-act="ostart" data-mode="mock">Mock 2-minute interview</button></div>
+    <p class="small muted">Mock mode draws random questions against the clock and saves the answers for the end.</p>
+  </section>
+  <section class="card"><h3>Choose topics</h3>
+    <div class="row"><button class="btn sm" data-act="oall">Select all</button><button class="btn sm" data-act="onone">Clear</button></div>
+    <div class="grid">${DATA.oral.map(c => `<button class="chip" style="border-radius:20px;padding:10px 16px;justify-content:space-between;text-align:left" data-act="otog" data-id="${c.id}" aria-pressed="${sel.has(c.id)}"><span>${c.id}. ${esc(c.zh)}</span><span class="small muted">${cnt(c)} cards · ${esc(c.prio)}</span></button>`).join('')}</div>
+  </section>
+  <section class="card flat small muted">The page cannot use your microphone. Say each answer out loud when you see the prompt, then tap “Show model answer” to compare. For feedback from Claude, type what you said, or use your keyboard's dictation, and paste it into “What I said”.</section>`;
+}
+function oralRun(m, all){
+  const R = V.run, mock = R.mode === 'mock';
+  const pool = all.filter(c => V.sel.has(c.cat.id));
+  if(!pool.length){ V.run = null; toast('Pick at least one topic'); return rOral(m); }
+  if(!R.card){ R.card = drawCard(pool, R.last); R.shown = false; R.n = (R.n || 0); }
+  const c = R.card;
+  m.innerHTML = `
+  <section class="card">
+    <div class="row between"><button class="btn sm" data-act="oend">${mock ? 'Finish' : '← Back'}</button>
+      <span class="tag acc">${esc(c.cat.id + '. ' + c.cat.zh)} · ${c.kind}</span><span class="timer" id="tm">00:00</span></div>
+    <p class="cue">${esc(c.cue)}</p>
+    ${c.kind === 'Follow-up' ? `<p class="small muted">Continues from your opening line: <span class="fr" style="font-size:.95rem">${esc(c.cat.opener)}</span></p>` : ''}
+    <p class="muted small">${mock ? 'Answer against the clock, then move on. Model answers are for review afterwards.' : 'Say it out loud first, then compare. Aim for 2 to 4 sentences.'}</p>
+    <div class="row">
+      ${mock ? '<button class="btn primary go" data-act="onext">Next question</button>' : '<button class="btn primary go" data-act="oshow">Show model answer</button>'}
+      ${canSpeak && !mock && c.fr ? '<button class="btn" data-act="oread" data-w="q">Read question aloud</button>' : ''}
+    </div>
+    <div id="oans" ${R.shown ? '' : 'hidden'} class="stack">
+      <div class="answer">${esc(c.ans)}</div>
+      <div class="row">${canSpeak ? '<button class="btn sm" data-act="oread" data-w="a">Read aloud</button>' : ''}
+        <span class="small muted">How did it go?</span>
+        <button class="btn sm" data-act="orate" data-r="2">Fluent</button><button class="btn sm" data-act="orate" data-r="1">Hesitant</button><button class="btn sm" data-act="orate" data-r="0">Couldn't say it</button></div>
+      <details><summary>Get Claude's feedback on what I said</summary>
+        <div class="stack" style="margin-top:8px"><textarea id="said" style="min-height:90px" placeholder="Write what you just said here (keyboard dictation works)"></textarea>
+        <div><button class="btn sm primary" data-act="osay">Get feedback</button></div><div id="ofb"></div></div></details>
+    </div>
+  </section>
+  <section class="card flat small muted">${mock ? 'Answered so far: ' + R.n + '. The whole mock lasts 2 minutes.' : 'Cards practised this round: ' + R.n + '.'}</section>`;
+  if(mock){ if(!R.t0){ R.t0 = Date.now(); } const left = 120 - (Date.now() - R.t0) / 1000; startTimer($('#tm'), Math.max(1, left), {onEnd: () => finishMock()}); }
+  else startTimer($('#tm'), 0, {up:true});
+}
+function finishMock(){
+  const R = V.run; V.run = null; stopTimer();
+  const n = (R && R.n) || V.last_n || 0;
+  $('#main').innerHTML = `<section class="card"><h2>Time's up</h2><p>You answered ${n} question${n === 1 ? '' : 's'} in this mock. In the real exam, when you get stuck, bridge with your opening line or a filler such as <i>comment dire…</i> or <i>en fait…</i> and keep talking.</p>
+    <div class="row"><button class="btn primary go" data-act="ostart" data-mode="mock">Go again</button><button class="btn" data-act="oend">Back to topics</button></div></section>`;
+  bump('o', Math.max(1, n));
+}
+
+/* ---------- Tenses ---------- */
+const TENSES = ['présent','passé composé','imparfait','plus-que-parfait','futur simple','conditionnel présent','subjonctif présent'];
+const TZH = {'présent':'present','passé composé':'perfect past','imparfait':'imperfect','plus-que-parfait':'pluperfect','futur simple':'simple future','conditionnel présent':'conditional','subjonctif présent':'subjunctive'};
+const IDENT = ['présent','passé composé','imparfait','plus-que-parfait','futur simple','futur proche','passé récent','conditionnel présent','conditionnel passé','subjonctif présent','subjonctif passé','impératif','participe présent','infinitif','gérondif'];
+const DEFV = ['être','avoir','aller','faire','pouvoir','vouloir','devoir'];
+function pronLabel(i, form, tense){
+  const v = /^[aeiouhàâéèêîôû]/i.test(form), sub = tense === 'subjonctif présent';
+  if(sub){ return i === 0 ? (v ? "que j'" : 'que je') : i === 2 ? "qu'il/elle" : i === 5 ? "qu'ils/elles" : 'que ' + ['','tu','','nous','vous',''][i]; }
+  return i === 0 ? (v ? "j'" : 'je') : DATA.pron[i];
+}
+function accepted(verb, tense, i){
+  const c = DATA.conj[verb], f = c.forms[tense][i], set = [f];
+  if(c.aux === 'être' && /^(suis|es|est|sommes|êtes|sont|étais|était|étions|étiez|étaient) /.test(f)){
+    const [a, pp] = f.split(' '); ['e','s','es','(e)','(s)','(es)','(e)(s)'].forEach(x => set.push(a + ' ' + pp + x));
+  }
+  return set;
+}
+function stripPron(s){ return s.replace(/^(que |qu')\s*/i, '').replace(/^(je|j'|tu|il\/elle|il|elle|on|nous|vous|ils\/elles|ils|elles)\s*/i, '').trim(); }
+function pickDrill(){
+  const vs = [...V.vs], ts = [...V.ts]; if(!vs.length || !ts.length) return null;
+  const pairs = []; vs.forEach(v => ts.forEach(t => pairs.push([v, t, 1 + 3 * (S.drill.wrong[v + '|' + t] || 0)])));
+  let tot = pairs.reduce((a, p) => a + p[2], 0), x = Math.random() * tot;
+  for(const p of pairs){ x -= p[2]; if(x <= 0) return [p[0], p[1]]; } return [pairs[0][0], pairs[0][1]];
+}
+function rTense(m){
+  V.vs = V.vs || new Set(DEFV); V.ts = V.ts || new Set(['présent','passé composé','imparfait','futur simple','conditionnel présent']);
+  V.mode = V.mode || 'table';
+  const verbs = Object.keys(DATA.conj);
+  if(!V.cur && V.mode === 'table') V.cur = pickDrill();
+  m.innerHTML = `
+  <section class="card"><div class="row between"><h2>Tense <span class="dim">drills</span></h2>
+    <div class="row"><button class="chip" data-act="tmode" data-k="table" aria-pressed="${V.mode === 'table'}">Conjugation tables</button><button class="chip" data-act="tmode" data-k="id" aria-pressed="${V.mode === 'id'}">Spot the tense</button></div></div>
+    <p class="muted small">${V.mode === 'table' ? 'Write the whole table from memory, then check. Combinations you miss come back more often. You can leave out the pronouns.' : 'Paste a French text (or use a model text). Claude pulls out the verbs and you decide which tense each one is.'}</p></section>
+  <div id="tbody" class="stack"></div>
+  <section class="card"><details ${V.mode === 'table' ? 'open' : ''}><summary>Choose verbs and tenses</summary>
+    <div class="stack" style="margin-top:12px">
+      <div class="row"><b class="small" style="font-weight:600">Verbs</b><button class="btn sm" data-act="vall">All</button><button class="btn sm" data-act="vnone">None</button></div>
+      <div class="vgrid">${verbs.map(v => `<button class="chip" data-act="vtog" data-v="${esc(v)}" aria-pressed="${V.vs.has(v)}">${esc(v)}</button>`).join('')}</div>
+      <b class="small" style="font-weight:600">Tenses</b>
+      <div class="vgrid">${TENSES.map(t => `<button class="chip" data-act="ttog" data-t="${esc(t)}" aria-pressed="${V.ts.has(t)}">${esc(t)} <span class="muted">${TZH[t]}</span></button>`).join('')}</div>
+    </div></details></section>`;
+  if(V.mode === 'table') tTable($('#tbody')); else tID($('#tbody'));
+}
+function tTable(b){
+  if(!V.cur){ b.innerHTML = '<section class="card"><p>Pick at least one verb and one tense.</p></section>'; return; }
+  const [v, t] = V.cur, c = DATA.conj[v];
+  b.innerHTML = `<section class="card">
+    <div class="row between"><h3><span style="font-size:1.6rem;font-weight:300">${esc(v)}</span> <span class="muted small">${esc(c.zh)}</span></h3><span class="tag acc">${esc(t)} · ${TZH[t]}</span></div>
+    <div class="stack" id="drows">${c.forms[t].map((f, i) => `<div class="drow" data-i="${i}"><label for="d${i}">${esc(pronLabel(i, f, t))}</label><input class="in" id="d${i}" autocomplete="off" autocapitalize="off" spellcheck="false"><span class="mk"></span></div>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-act="dcheck">Check</button><button class="btn" data-act="dnext">Another table</button>
+      <label class="small row" style="gap:6px"><input type="checkbox" id="dloose"> Ignore accents</label><span id="dres" class="small muted"></span></div>
+    ${c.aux === 'être' && (t === 'passé composé' || t === 'plus-que-parfait') ? '<p class="small muted">This verb takes être, so the past participle agrees with the subject. allé, allée and allé(e) are all accepted.</p>' : ''}
+  </section>`;
+  $('#d0').focus();
+}
+async function tID(b){
+  b.innerHTML = `<section class="card"><h3>Text</h3>
+    <textarea id="idtext" style="min-height:130px" placeholder="Paste French text here (60 to 120 words works best)">${esc(V.idtext || '')}</textarea>
+    <div class="row"><button class="btn" data-act="idsample">Use a model text</button><button class="btn primary" data-act="idrun">Extract verbs</button></div></section>
+    <div id="idout">${V.idres ? idHTML() : ''}</div>`;
+}
+function idHTML(){
+  const r = V.idres;
+  return `<section class="card"><h3>Name the tense <span class="muted small">(${r.length} verbs, tagged by Claude; check a grammar book if in doubt)</span></h3>
+    <div class="scroll"><table><thead><tr><th>In the text</th><th>Your answer</th><th></th></tr></thead><tbody>${r.map((x, i) => `<tr data-i="${i}"><td style="font-size:1rem">${esc(x.form)}</td><td><select class="in" aria-label="Tense ${i + 1}"><option value="">Choose a tense</option>${IDENT.map(t => `<option>${esc(t)}</option>`).join('')}</select></td><td class="small"></td></tr>`).join('')}</tbody></table></div>
+    <div class="row"><button class="btn primary" data-act="idcheck">Check</button><span id="idres" class="small muted"></span></div></section>`;
+}
+const IDPROMPT = txt => `You are a French teacher. In the text below, find the conjugated verb forms (at most 22, in order of appearance; choose varied forms and skip obvious repeats). For each give: "form" (the form as it appears, with auxiliary and pronoun if present, for example "j'ai rejoint"), "inf" (the infinitive), "tense" (exactly one of these values: ${IDENT.join(', ')}), "person" (je, tu, il, elle, on, nous, vous, ils, elles, ce, cela...).
+Reply ONLY with a JSON array.
+Text:
+"""
+${txt}
+"""`;
+
+/* ---------- Progress ---------- */
+function rProg(m){
+  const days = []; for(let i = 13; i >= 0; i--){ const d = new Date(); d.setDate(d.getDate() - i); const x = S.days[ymd(d)] || {w:0,o:0,d:0}; days.push({d, n:x.w + x.o + x.d, x}); }
+  const mx = Math.max(3, ...days.map(x => x.n));
+  const totals = Object.values(S.days).reduce((a, x) => ({w:a.w + (x.w || 0), o:a.o + (x.o || 0), d:a.d + (x.d || 0)}), {w:0,o:0,d:0});
+  const doneLv = ITEMS.reduce((a, it) => a + wProgress(it.id), 0);
+  const st = S.drill.stats;
+  m.innerHTML = `
+  <section class="card"><h2>Your <span class="dim">progress</span></h2></section>
+  <section class="grid">
+    <div class="card stat"><span class="muted small">Writing exercises</span><b>${totals.w}</b><span class="small muted">${doneLv} of ${ITEMS.length * 5} levels done</span></div>
+    <div class="card stat"><span class="muted small">Speaking cards</span><b>${totals.o}</b><span class="small muted">${Object.keys(S.oral.cards).length} different cards seen</span></div>
+    <div class="card stat"><span class="muted small">Conjugation tables</span><b>${totals.d}</b></div>
+  </section>
+  <section class="card"><h3>Last 14 days</h3>
+    <div style="display:grid;grid-template-columns:repeat(14,1fr);gap:4px;align-items:end;height:90px">${days.map(x => `<div title="${ymd(x.d)}: ${x.n}" style="height:${Math.max(4, x.n / mx * 100)}%;background:${x.n ? 'var(--orange)' : 'var(--edge)'};border-radius:99px"></div>`).join('')}</div>
+    <div class="row between small muted"><span>${ymd(days[0].d).slice(5)}</span><span>Today</span></div></section>
+  <section class="card"><h3>Tense accuracy</h3>
+    ${Object.keys(st).length ? `<table><tbody>${TENSES.filter(t => st[t]).map(t => { const p = Math.round(st[t].c / st[t].t * 100); return `<tr><td>${esc(t)}</td><td style="width:45%"><div class="bar"><i style="width:${p}%;background:${p >= 80 ? 'var(--ok)' : 'var(--orange)'}"></i></div></td><td class="num">${p}%</td></tr>`; }).join('')}</tbody></table>` : '<p class="muted small">Nothing yet. Do a few conjugation tables and your accuracy will show here.</p>'}</section>
+  <section class="card"><div class="row between"><h3>Mistakes notebook <span class="muted small">(${S.errors.length})</span></h3>${S.errors.length ? '<button class="btn sm" data-act="errclear">Clear</button>' : ''}</div>
+    ${S.errors.length ? `<div class="stack">${(function(){ const by = {}; S.errors.forEach(e => by[e.type] = (by[e.type] || 0) + 1); return '<div class="row">' + Object.entries(by).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<span class="tag warn">${esc(k)} ${n}</span>`).join('') + '</div>'; })()}
+      <div class="scroll"><table><thead><tr><th>You wrote</th><th>Better</th><th>Why</th></tr></thead><tbody>${S.errors.slice(0, 40).map(e => `<tr><td style="color:var(--bad)">${esc(e.orig)}</td><td style="color:var(--ok);font-weight:600">${esc(e.fix)}</td><td class="small">${esc(e.type)}: ${esc(e.why)}</td></tr>`).join('')}</tbody></table></div></div>` : '<p class="muted small">After Claude reviews a text, the mistakes are saved here so you can see which kinds keep coming back.</p>'}</section>
+  <section class="card flat small muted">Progress is saved to your account, so it follows you to other devices. <button class="btn sm" data-act="reset" style="margin-left:8px">Erase all progress</button></section>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async ev => {
+  const el = ev.target.closest('[data-act]'); if(!el) return;
+  const a = el.dataset.act, body = $('#lvbody');
+  switch(a){
+    case 'tab': return go(el.dataset.k);
+    case 'goto': return go(el.dataset.k);
+    case 'wfilter': V.f = +el.dataset.k; return render();
+    case 'openw': return go('write', {id:el.dataset.id, lv:+el.dataset.lv || recLevel(el.dataset.id)});
+    case 'wback': return go('write');
+    case 'wlv': V.lv = +el.dataset.lv; return render();
+    case 'c1check': { let ok = 0, tot = 0; const loose = $('#loose').checked; $$('input.blank', body).forEach(i => { tot++; const good = norm(i.value, loose) === norm(i.dataset.ans, loose); i.classList.toggle('ok', good); i.classList.toggle('bad', !good && i.value.trim() !== ''); if(good) ok++; });
+      $('#c1res').textContent = ok + ' / ' + tot + ' correct'; if(ok / tot >= .8){ const it = body._it, w = body._w; if(!w.done[1]) markDone(it, w, 1, {score:ok + '/' + tot}); } return; }
+    case 'c1show': $$('input.blank', body).forEach(i => { i.value = i.dataset.ans; i.classList.add('ok'); i.classList.remove('bad'); }); return;
+    case 's2cmp': $$('.cmp', body).forEach(c => c.hidden = false); return;
+    case 's2done': { const it = body._it, w = body._w; if(!w.done[2]) markDone(it, w, 2); else toast('Already completed'); return; }
+    case 'aifb': return runFeedback(body, +el.dataset.lv);
+    case 'm3start': { $('#m3model').hidden = false; el.disabled = true; startTimer($('#tm'), 90, {onEnd: () => { $('#m3model').hidden = true; el.disabled = false; el.textContent = 'Look again'; $('#t3a').focus(); }}); return; }
+    case 'm3peek': { const it = body._it, c = $('#m3cmp'); c.hidden = false; c.innerHTML = modelHTML(it); return; }
+    case 'done3': { const it = body._it, w = body._w; if(!w.done[3]) markDone(it, w, 3, {words:wordCount($('#t3b').value)}); else toast('Already completed'); return; }
+    case 'peek4': $('#m4').hidden = !$('#m4').hidden; return;
+    case 'done4': { const it = body._it, w = body._w; if(!w.done[4]) markDone(it, w, 4, {words:wordCount($('#t4').value)}); else toast('Already completed'); return; }
+    case 't5start': { const it = body._it, t = TASK[it.task], ta = $('#t5'); ta.disabled = false; ta.focus(); el.disabled = true;
+      startTimer($('#tm'), t.secs, {onEnd: () => { toast("Time's up"); $('#used').textContent = 'Over time'; }}); return; }
+    case 'otog': { const id = +el.dataset.id; V.sel.has(id) ? V.sel.delete(id) : V.sel.add(id); el.setAttribute('aria-pressed', V.sel.has(id)); return; }
+    case 'oall': V.sel = new Set(DATA.oral.map(c => c.id)); return render();
+    case 'onone': V.sel = new Set(); return render();
+    case 'ostart': { if(!V.sel || !V.sel.size) V.sel = new Set(DATA.oral.map(c => c.id)); V.run = {mode:el.dataset.mode, n:0}; return render(); }
+    case 'oend': { const r = V.run; if(r && r.mode === 'mock'){ V.last_n = r.n; return finishMock(); } V.run = null; stopTimer(); return render(); }
+    case 'oshow': { V.run.shown = true; $('#oans').hidden = false; el.disabled = true; return; }
+    case 'onext': { const R = V.run; if(R.card){ S.oral.cards[R.card.key] = Object.assign(S.oral.cards[R.card.key] || {}, {last:1, ts:Date.now()}); } R.n++; R.last = R.card && R.card.key; R.card = null; save(); return render(); }
+    case 'orate': { const R = V.run; S.oral.cards[R.card.key] = {last:+el.dataset.r, ts:Date.now()}; R.n++; R.last = R.card.key; R.card = null; bump('o'); return render(); }
+    case 'oread': return speak(el.dataset.w === 'q' ? V.run.card.cue : V.run.card.ans);
+    case 'osay': { const R = V.run, c = R.card, said = $('#said').value.trim(), box = $('#ofb'); if(wordCount(said) < 3){ box.innerHTML = '<p class="muted small">Write what you said first.</p>'; return; }
+      box.innerHTML = '<p class="muted small">Claude is listening to your answer…</p>';
+      try{ const r = await askJSON(`You are a TCF Canada examiner, spoken expression, Task 1 (guided interview, about 2 minutes, target level CLB 7). The student answered out loud; what follows is an approximate transcript (it may contain dictation errors; do not count obvious ones as the student's mistakes). All explanations must be in English; French is only for corrections and model sentences.
+Question or topic: ${c.cue}
+Student's own model answer: ${c.ans}
+What the student said: """${said}"""
+Reply ONLY with JSON: {"answers":true or false (answers the question),"summary":"assessment in English, 1 or 2 sentences","errors":[{"orig":"","fix":"","why":"short explanation in English"}],"natural":"a more natural, fluent version in French, 2 to 4 sentences","tip":"one concrete tip for next time, in English"}`);
+        box.innerHTML = `<div class="stack"><p>${esc(r.summary)}</p>${(r.errors || []).map(e => `<div class="err"><span class="o">${esc(e.orig)}</span><span class="f">→ ${esc(e.fix)}</span><span class="small muted">${esc(e.why)}</span></div>`).join('')}<div class="answer">${esc(r.natural)}</div><p class="small"><b style="font-weight:600">Next time:</b> ${esc(r.tip)}</p></div>`;
+      }catch(e){ box.innerHTML = `<p style="color:var(--bad)">${aiErr(e)}</p>`; } return; }
+    case 'tmode': V.mode = el.dataset.k; V.cur = null; return render();
+    case 'vtog': { const v = el.dataset.v; V.vs.has(v) ? V.vs.delete(v) : V.vs.add(v); el.setAttribute('aria-pressed', V.vs.has(v)); V.cur = null; return; }
+    case 'ttog': { const t = el.dataset.t; V.ts.has(t) ? V.ts.delete(t) : V.ts.add(t); el.setAttribute('aria-pressed', V.ts.has(t)); V.cur = null; return; }
+    case 'vall': V.vs = new Set(Object.keys(DATA.conj)); V.cur = null; return render();
+    case 'vnone': V.vs = new Set(); V.cur = null; return render();
+    case 'drill': go('tense', {mode:'table', vs:new Set([el.dataset.v]), ts:new Set([el.dataset.t]), cur:[el.dataset.v, el.dataset.t]}); return;
+    case 'dnext': V.cur = pickDrill(); return tTable($('#tbody'));
+    case 'dcheck': { const [v, t] = V.cur, loose = $('#dloose').checked; let ok = 0;
+      $$('.drow').forEach(r => { const i = +r.dataset.i, inp = $('input', r), mk = $('.mk', r), old = $('.corr', r); if(old) old.remove();
+        const val = norm(stripPron(inp.value), loose), acc = accepted(v, t, i).map(x => norm(x, loose));
+        const good = acc.includes(val); inp.classList.toggle('ok', good); inp.classList.toggle('bad', !good); mk.textContent = good ? '✓' : '✗'; mk.style.color = good ? 'var(--ok)' : 'var(--bad)';
+        if(!good){ const d = document.createElement('div'); d.className = 'corr'; d.textContent = DATA.conj[v].forms[t][i]; r.appendChild(d); } else ok++; });
+      $('#dres').textContent = ok + ' / 6 correct';
+      const k = v + '|' + t; S.drill.wrong[k] = ok === 6 ? Math.max(0, (S.drill.wrong[k] || 0) - 1) : (S.drill.wrong[k] || 0) + 1;
+      const s = S.drill.stats[t] = S.drill.stats[t] || {c:0, t:0}; s.c += ok; s.t += 6; bump('d'); return; }
+    case 'idsample': { const it = pick(ITEMS.filter(x => x.task < 3)); $('#idtext').value = it.model.replace(/\n\n/g, '\n'); return; }
+    case 'idrun': { const txt = $('#idtext').value.trim(); if(wordCount(txt) < 15){ toast('Paste a text first'); return; } V.idtext = txt; const out = $('#idout'); out.innerHTML = '<section class="card"><p class="muted">Claude is finding the verbs…</p></section>';
+      try{ const r = await askJSON(IDPROMPT(txt)); V.idres = (Array.isArray(r) ? r : (r.verbs || [])).filter(x => x && x.form && x.tense).slice(0, 22); out.innerHTML = idHTML(); }
+      catch(e){ out.innerHTML = `<section class="card"><p style="color:var(--bad)">${aiErr(e)}</p></section>`; } return; }
+    case 'idcheck': { let ok = 0, tot = 0; $$('#idout tbody tr').forEach(tr => { const i = +tr.dataset.i, x = V.idres[i], sel = $('select', tr), cell = tr.lastElementChild; tot++;
+        const good = sel.value === x.tense; if(good) ok++; sel.classList.toggle('bad', !good && !!sel.value);
+        cell.innerHTML = good ? '<span style="color:var(--ok)">✓</span>' : `<span style="color:var(--bad)">${esc(x.tense)}</span><br><span class="muted">${esc(x.inf || '')} · ${esc(x.person || '')}</span>`; });
+      $('#idres').textContent = ok + ' / ' + tot + ' correct'; bump('d'); return; }
+    case 'errclear': S.errors = []; save(); return render();
+    case 'reset': { if(!el._arm){ el._arm = true; el.textContent = 'Tap again to confirm'; setTimeout(() => { el._arm = false; el.textContent = 'Erase all progress'; }, 3000); return; } S = blank(); save(); toast('Progress erased'); return render(); }
+  }
+});
+function recLevel(id){ const w = S.writing[id]; let lv = 1; while(w && w.done && w.done[lv] && lv < 5) lv++; return lv; }
+
+/* ---------- init ---------- */
+countdown();
+render();
+initStore();
+})();
+</script>
