@@ -269,9 +269,12 @@ async function askJSON(prompt, tier){
   }
   if(!WORKER) throw {code:'unavailable'};
   let r;
-  try{ r = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt, tier:tier || 'pro'})}); }
+  let pc = ''; try{ pc = localStorage.getItem('cahier-pass') || ''; }catch(e){}
+  if(!pc){ pc = (window.prompt('Enter your passcode for AI feedback') || '').trim(); if(!pc) throw {code:'auth', message:'Passcode needed'}; try{ localStorage.setItem('cahier-pass', pc); }catch(e){} }
+  try{ r = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json', 'X-Passcode':pc}, body:JSON.stringify({prompt, tier:tier || 'pro'})}); }
   catch(e){ throw {code:'network', message:'No connection'}; }
   const d = await r.json().catch(() => null);
+  if(r.status === 401){ try{ localStorage.removeItem('cahier-pass'); }catch(e){} throw {code:'auth', message:'Wrong passcode. Tap the button to try again.'}; }
   if(!r.ok || !d || d.error) throw {code:'server', message:(d && d.error) || ('HTTP ' + r.status)};
   return parseLoose(d.text);
 }
